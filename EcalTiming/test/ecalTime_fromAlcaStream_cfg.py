@@ -25,6 +25,11 @@ options.register('offset',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
                  "add this to each crystal time")
+options.register('minEnergy',
+                 0.0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "add this to minimum energy threshold")
 options.register('isSplash',
                  0,
                  VarParsing.VarParsing.multiplicity.singleton,
@@ -200,11 +205,12 @@ process.load("Geometry.EcalMapping.EcalMappingRecord_cfi")
 
 #ESLooperProducer looper is imported here:
 process.load('EcalTiming.EcalTiming.ecalTimingCalibProducer_cfi')
+
 process.timing.isSplash= cms.bool(True if options.isSplash else False)
 process.timing.makeEventPlots=evtPlots
 process.timing.globalOffset = cms.double(options.offset)
 process.timing.outputDumpFile = process.TFileService.fileName
-process.timing.minRecHitEnergy = cms.double(0.5)
+process.timing.energyThresholdOffset = cms.double(options.minEnergy)
 
 
 process.analysis = cms.Sequence( process.timing )
@@ -223,8 +229,6 @@ else:
 	process.endp = cms.EndPath(process.RECOoutput)
 
 process.p = cms.Path(process.seq)
-
-#process.schedule = cms.Schedule(process.p, process,enp)
 
 processDumpFile = open('processDump.py', 'w')
 print >> processDumpFile, process.dumpPython()
