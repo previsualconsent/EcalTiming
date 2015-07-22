@@ -2,11 +2,12 @@ RUNLIST="243479 243484 243506"
 RUNLIST="248030"
 RUNLIST=`cat runlist`
 RUNLIST="251244 251251 251252 251521 251522 251548 251559 251560 251561 251562"
+RUNLIST="251562"
 
 STREAM=AlCaPhiSym
 NEVENTS=-1
 QUEUE=2nd
-DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/round1
+DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/round1/
 CONFIG=test/ecalTime_fromAlcaStream_cfg.py
 
 FROMRECO=NO
