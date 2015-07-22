@@ -20,6 +20,11 @@ options.register('offset',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
                  "add this to each crystal time")
+options.register('minEnergy',
+                 0.0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "add this to minimum energy threshold")
 options.register('isSplash',
                  0,
                  VarParsing.VarParsing.multiplicity.singleton,
@@ -221,7 +226,7 @@ process.filter.isSplash= cms.bool(True if options.isSplash else False)
 process.filter.makeEventPlots=evtPlots
 process.filter.globalOffset = cms.double(options.offset)
 process.filter.outputDumpFile = process.TFileService.fileName
-process.filter.minRecHitEnergy = cms.double(0.5)
+process.filter.energyThresholdOffset = cms.double(options.minEnergy)
 
 process.p = cms.Path( process.filter )
 ### Schedule ###
