@@ -99,21 +99,18 @@ def addFitToPlot(h):
 	return mu,sigma
 
 
-def plotMaps(tree, outdir, prefix=""):
+def plotCCUs(tree, outdir, prefix=""):
 	c = ROOT.TCanvas("c","c",1600,900)
 	# dictionaries to store histograms
 	time = dict()
-	time_rel2012 = dict()
-	timeError = dict()
-	stdDev = dict()
-	occupancy = dict()
-	energy = dict()
-	iRing = dict()
-	time1d = dict()
-	EvsT = dict()
+	time_offset = dict()
+	time_offset_ccu = dict()
+	time_abs = dict()
 
 	CCU = dict()
+	CCU1d = dict()
 	CCU_maps = dict()
+	CCU_maps_cut = dict()
 	CCU_err_maps = dict()
 	elec_map = dict()
 	counter = 0
@@ -128,6 +125,11 @@ def plotMaps(tree, outdir, prefix=""):
 		offset[iz],__ = addFitToPlot(h)
 		c.SaveAs(outdir + '/' + detectors[iz] + "_1d_noffset.png")
 
+	print "Global offset"
+	for iz in offset:
+		print "%d\t%.3f"%(iz, offset[iz])
+
+	timing = dict()
 	from EcalTiming.EcalTiming.loadOldCalib import getCalib
 	oldCalib = getCalib()
 
@@ -147,22 +149,18 @@ def plotMaps(tree, outdir, prefix=""):
 			print "Found nan", event.rawid, event.ix, event.iy, iz, event.num
 			continue
 		# initialize histograms (if they haven't been made yet
-		initHists(prefix,time, initMap, key, "time", "Time [ns]")
-		initHists(prefix,time_rel2012, initMap, key, "time_rel2012", "Time - old calib [ns]")
-		initHists(prefix,timeError, initMap, key, "timeError", "Time Error[ns]")
-		initHists(prefix,stdDev, initMap, key, "stdDev", "Std Dev [ns]")
-		initHists(prefix,time1d, inittime1d, key, "time1d", "time1d")
-
-		initHists(prefix,occupancy, initMap, key, "occupancy", "Occupancy")
-		initHists(prefix,energy, initMap, key, "energy", "Energy [GeV]")
-		initHists(prefix,iRing, initiRing, key, "iRing", "iRing")
-		initHists(prefix,EvsT, initEvsT, key, "EvsT", "EvsT")
+		initHists(prefix,time, initMap, key, "time", "Time Shifts [ns]")
+		initHists(prefix,time_offset, initMap, key, "time_offset", "Time Shifts - Global [ns]")
+		initHists(prefix,time_offset_ccu, initMap, key, "time_offset_ccu", "Time Shifts - Global - HW [ns]")
+		initHists(prefix,time_abs, initMap, key, "time_abs", "Absolute Time [ns]")
 
 		initHists(prefix,CCU, inittime1d, (event.elecID), "ccu_time", " CCU Time [ns]")
-		initHists(prefix,CCU_maps, initMap, key, "ccu_time_map", "CCU Map [ns]")
-		initHists(prefix,CCU_err_maps, initMap, key, "ccu_timeError_map", "CCU Error Map [ns]")
+		initHists(prefix,CCU1d, inittime1d, key, "ccu_time1d", " CCU Time [ns]")
+		initHists(prefix,CCU_maps, initMap, key, "time_ccu", "CCU Shifts Map [ns]")
+		initHists(prefix,CCU_maps_cut, initMap, key, "time_ccu_cut", "CCU Shifts Map [ns]")
+		initHists(prefix,CCU_err_maps, initMap, key, "timeError_ccu", "StdDev of Crystals in CCU [ns]")
 		
-		elec_map[( event.ix, event.iy, iz)] = event.elecID
+		elec_map[( event.ix, event.iy, iz, event.rawid)] = event.elecID
 		
 		# fill histograms
 		if iz == 0:
@@ -173,41 +171,52 @@ def plotMaps(tree, outdir, prefix=""):
 			y = event.iy
 
 		
-		t = event.time - offset[iz]
+		time[key].Fill(x, y, event.time)
+		time_offset[key].Fill(x, y, event.time - offset[iz])
+		CCU[event.elecID].Fill(event.time - offset[iz])
+		time_abs[iz].Fill(x,y, event.time - offset[iz] - oldCalib[event.rawid])
 
-		time[key].Fill(x, y, t)
-		timeError[key].Fill(x, y, event.timeError)
-		stdDev[key].Fill(x, y, event.timeError  * math.sqrt(event.num))
-		time1d[key].Fill(t)
-
-		occupancy[key].Fill(x, y, event.num)
-		energy[key].Fill(x, y, event.energy)
-		EvsT[key].Fill(event.energy, t)
-		iRing[key].Fill(event.iRing, t)
-
-		CCU[event.elecID].Fill(t)
-
-		if event.rawid in oldCalib:
-			time_rel2012[key].Fill(x,y, t - oldCalib[event.rawid])
-		else:
-			print "Rawid not found", event.rawid 
-
-
-	for ix,iy,iz in elec_map:
+	print "CCU shifts"
+	done = set()
+	ccu_cut = {0:1.04, 1:1.0, -1:1.0}
+	for ix,iy,iz,rawid in elec_map:
+		id = elec_map[(ix,iy,iz,rawid)]
 		if iz == 0:
 			x = iy
 			y = ix
 		else:
 			x = ix
 			y = iy
-		CCU_maps[iz].Fill(x,y,CCU[elec_map[(ix,iy,iz)]].GetMean())
-		CCU_err_maps[iz].Fill(x,y,CCU[elec_map[(ix,iy,iz)]].GetStdDev())
+		t = CCU[id].GetMean()
+		err = CCU[id].GetStdDev()
+		CCU_maps[iz].Fill(x,y,t)
+		CCU_err_maps[iz].Fill(x,y,err)
+		ccu_unit = 25./24.
+		time_in_ccu_unit = t / ccu_unit
+		if abs(time_in_ccu_unit) > ccu_cut[iz] and err < 1.0:
+			t_offset_ccu = round(time_in_ccu_unit) * ccu_unit
+			CCU_maps_cut[iz].Fill(x,y,t_offset_ccu)
 
+		if id not in done:
+			done.add(id)
+			CCU1d[iz].Fill(t)
+			if abs(time_in_ccu_unit) > ccu_cut[iz] and err < 1.0:
+				print iz, ix, iy, id >> 7, id & 2**8-1, round(t/ccu_unit)
+
+
+
+	r = 3
 	for key in CCU_maps:
-		CCU_maps[key].SetAxisRange(-2, 2, "Z")
+		CCU_maps[key].SetAxisRange(-r, r, "Z")
 		CCU_maps[key].SetZTitle("[ns]")
 		CCU_maps[key].Draw("colz")
 		c.SaveAs(outdir + "/" + CCU_maps[key].GetName() + ".png")
+
+	for key in CCU_maps_cut:
+		CCU_maps_cut[key].SetAxisRange(-r, r, "Z")
+		CCU_maps_cut[key].SetZTitle("[ns]")
+		CCU_maps_cut[key].Draw("colz")
+		c.SaveAs(outdir + "/" + CCU_maps_cut[key].GetName() + ".png")
 
 	for key in CCU_err_maps:
 		CCU_err_maps[key].SetAxisRange(0, 2, "Z")
@@ -216,70 +225,53 @@ def plotMaps(tree, outdir, prefix=""):
 		c.SaveAs(outdir + "/" + CCU_err_maps[key].GetName() + ".png")
 		
 	for key in time:
-		time[key].SetAxisRange(-10, 10, "Z")
+		time[key].SetAxisRange(-r, r, "Z")
 		time[key].SetZTitle("[ns]")
 		time[key].Draw("colz")
-		c.SaveAs(outdir + "/" + time[key].GetName() + ".10.png")
-		time[key].SetAxisRange(-5,5,"Z")
-		time[key].Draw("colz")
-		c.SaveAs(outdir + "/" + time[key].GetName() + ".5.png")
-		time[key].SetAxisRange(-2,2,"Z")
-		time[key].Draw("colz")
-		c.SaveAs(outdir + "/" + time[key].GetName() + ".2.png")
+		c.SaveAs(outdir + "/" + time[key].GetName() + ".png")
 
-	for key in time_rel2012:
-		time_rel2012[key].SetAxisRange(-10, 10, "Z")
-		time_rel2012[key].SetZTitle("[ns]")
-		time_rel2012[key].Draw("colz")
-		c.SaveAs(outdir + "/" + time_rel2012[key].GetName() + ".png")
+	for key in time_offset:
+		time_offset[key].SetAxisRange(-r, r, "Z")
+		time_offset[key].SetZTitle("[ns]")
+		time_offset[key].Draw("colz")
+		c.SaveAs(outdir + "/" + time_offset[key].GetName() + ".png")
 
-	for key in timeError:
-		timeError[key].SetAxisRange(0, .2, "Z")
-		timeError[key].SetZTitle("[ns]")
-		timeError[key].Draw("colz")
-		c.SaveAs(outdir + "/" + timeError[key].GetName() + ".png")
+	for key in time_offset_ccu:
+		time_offset_ccu[key].Add(time_offset[key], CCU_maps_cut[key], 1, -1 )
+		time_offset_ccu[key].SetAxisRange(-r, r, "Z")
+		time_offset_ccu[key].SetZTitle("[ns]")
+		time_offset_ccu[key].Draw("colz")
+		c.SaveAs(outdir + "/" + time_offset_ccu[key].GetName() + ".png")
 
-	for key in stdDev:
-		stdDev[key].SetAxisRange(0, 3, "Z")
-		stdDev[key].SetZTitle("[ns]")
-		stdDev[key].Draw("colz")
-		c.SaveAs(outdir + "/" + stdDev[key].GetName() + ".png")
+	def plotOutOfRange(h,hcut,low,high):
+		ncells =  h.GetNcells()
+		for i in range(ncells):
+			val = h.GetBinContent(i)
+			if val < low or val > high:
+				hcut.SetBinContent(i,val)
+				hcut.SetBinEntries(i,1)
+			 	x,y,z = ROOT.Long(),ROOT.Long(),ROOT.Long()
+			 	h.GetBinXYZ(i,x,y,z)
+				print h.GetName(), x,y,z, val
 
-	c.SetLogz(True)
-	if occupancy:
-		occu_max = max( [ occupancy[key].GetMaximum() for key in occupancy])
-	for key in occupancy:
-		occupancy[key].SetAxisRange(0, occu_max, "Z")
-		occupancy[key].SetZTitle("Events")
-		occupancy[key].Draw("colz")
-		c.SaveAs(outdir + "/" + occupancy[key].GetName() + ".png")
+	for key in time_abs:
+		time_abs[key].Add(CCU_maps_cut[key], -1)
+		time_abs[key].SetAxisRange(-10, 10, "Z")
+		time_abs[key].SetZTitle("[ns]")
+		time_abs[key].Draw("colz")
+		c.SaveAs(outdir + "/" + time_abs[key].GetName() + ".png")
+		
+		time_abs_oot = initMap("time_abs_oot", "Absolute Time OOT [ns]",key)
+		plotOutOfRange(time_abs[key], time_abs_oot, -10,10)
+		time_abs_oot.SetZTitle("[ns]")
+		time_abs_oot.Draw("colz")
+		c.SaveAs(outdir + "/" + time_abs_oot.GetName() + ".png")
 
-	c.SetLogz(False)
-	if energy:
-		en_max = max( [ energy[key].GetMaximum() for key in energy])
-	en_max = 5.0
-	for key in energy:
-		energy[key].Draw("colz")
-		energy[key].SetAxisRange(0, en_max, "Z")
-		energy[key].SetZTitle("[GeV]")
-		c.SaveAs(outdir + "/" + energy[key].GetName() + ".png")
 
-	for key in iRing:
-		graph = ROOT.TGraphErrors(iRing[key])
-		graph.Draw("AP")
-		iRing[key].Draw()
-		c.SaveAs(outdir + "/" + iRing[key].GetName() + ".png")
-	
-	for key in EvsT:
-		EvsT[key].Draw("colz")
-		c.SaveAs(outdir + "/" + EvsT[key].GetName() + ".png")
+	for key in CCU1d:
+		CCU1d[key].Draw()
+		c.SaveAs(outdir + "/" + CCU1d[key].GetName() + ".png")
 
-	ROOT.gStyle.SetOptStat(1111)
-	for key in time1d:
-		time1d[key].Draw()
-		addFitToPlot(time1d[key])
-		c.SaveAs(os.path.join(outdir, time1d[key].GetName() + ".png"))
-	
 	return time
 
 if __name__ == "__main__":
@@ -311,5 +303,6 @@ if __name__ == "__main__":
 
 	file = ROOT.TFile.Open(filename)
 	tree = file.Get("filter/EcalSplashTiming/timingTree")
-	time = plotMaps(tree, outdir, )
+	time = plotCCUs(tree, outdir, )
+
 

@@ -9,21 +9,16 @@ filename = sys.argv[1]
 
 detectors = {-1:"EEM", 0:"EB", 1:"EEP"}
 
-outdir = "plots"
-if len(sys.argv) > 2:
-	outdir = sys.argv[2]
-elif filename.startswith("output"):
-	# use same path as input file with output -> plots
-	outdir = os.path.normpath(os.path.join("plots" ,'/'.join(filename.split('/')[1:-1])))
+dir, basename = os.path.split(filename)
+dir = dir.split('/')
+print dir[-1:]
+outdir = '/'.join(dir[:-1]) + "/plots/" + dir[-1]
+outdir = os.path.normpath(outdir)
 
-diffToOldCalib = True
+from EcalTiming.EcalTiming.loadOldCalib import getCalib
+oldCalib = getCalib()
 
-if diffToOldCalib:
-	suffix = "_rel_2012"
-	from EcalTiming.EcalTiming.loadOldCalib import getCalib
-	oldCalib = getCalib()
-
-outdir = os.path.join(outdir, 'stability' + suffix)
+outdir = os.path.join(outdir, 'stability')
 outdir_backup = os.path.join(outdir, 'backup')
 
 def mkdir_p(path):
@@ -86,8 +81,8 @@ def initHists(hist_dict,init_func,key, name, title):
 	cut,iz = key
 	hist_dict[key] = init_func(name,title,iz)
 
-tree = file.Get("TriggerResults/EcalSplashTiming_0/energyStabilityTree")
-c = ROOT.TCanvas()
+tree = file.Get("filter/EcalSplashTiming/energyStabilityTree")
+c = ROOT.TCanvas("c","c",1600,900)
 # dictionaries to store histograms
 time = dict()
 occupancy = dict()
@@ -143,11 +138,6 @@ for event in tree:
 		y = event.iy
 
 	t = event.time - offset[iz]
-	if diffToOldCalib:
-		if event.rawid in oldCalib:
-			t += oldCalib[event.rawid]
-		else:
-			print "Rawid not found", event.rawid 
 
 	time[key].Fill(x, y, t)
 	occupancy[key].Fill(x, y, event.num)
@@ -155,13 +145,22 @@ for event in tree:
 
 	iRing[key].Fill(float(event.iRing), t)
 	time1d[key].Fill(t)
+	#if event.rawid in oldCalib:
+	#	t += oldCalib[event.rawid]
+	#else:
+	#	print "Rawid not found", event.rawid 
 
-c = ROOT.TCanvas()
 for key in time:
-	time[key].SetAxisRange(-10,10,"Z")
 	time[key].SetZTitle("[ns]")
+	time[key].SetAxisRange(-10,10,"Z")
 	time[key].Draw("colz")
-	c.SaveAs(outdir_backup + "/" + time[key].GetName() + ".png")
+	c.SaveAs(outdir_backup + "/" + time[key].GetName() + ".10.png")
+	time[key].SetAxisRange(-5,5,"Z")
+	time[key].Draw("colz")
+	c.SaveAs(outdir_backup + "/" + time[key].GetName() + ".5.png")
+	time[key].SetAxisRange(-2,2,"Z")
+	time[key].Draw("colz")
+	c.SaveAs(outdir_backup + "/" + time[key].GetName() + ".2.png")
 
 c.SetLogz(True)
 occu_max = max( [ occupancy[key].GetMaximum() for key in occupancy])
@@ -181,13 +180,16 @@ for key in energy:
 	c.SaveAs(outdir_backup + "/" + energy[key].GetName() + ".png")
 
 colors = [ROOT.kBlack,ROOT.kRed,ROOT.kGreen,ROOT.kBlue,ROOT.kMagenta,ROOT.kGray]
+markers = [ROOT.kFullCircle, ROOT.kFullSquare]
 
+ROOT.gStyle.SetHistLineWidth(1);
 for iz in [-1,0,1]:
+	keys = sorted([ (cut,iz) for cut,i in time if i == iz])
+	if not keys: continue
 	ic = 0
 	leg = ROOT.TLegend(0.15 ,0.15, 0.48, 0.35)
 	leg.SetNColumns(3)
 	leg.SetHeader("Mean time in iRing")
-	keys = sorted([ (cut,iz) for cut,i in time if i == iz])
 	mg = ROOT.TMultiGraph()
 	for i in range(1,len(keys)):
 		iRing_rel = initiRing("iRing_rel_%d_%d" % (i, i-1), "iRing Diff Step%d - Step%d" % (i, i-1), keys[i][1])
@@ -195,13 +197,16 @@ for iz in [-1,0,1]:
 
 		graph = ROOT.TGraphErrors(iRing_rel)
 		graph.SetLineColor(colors[ic % len(colors)])
-		leg.AddEntry(graph,"Step %d - %d" % (i,i-1), "le")
+		graph.SetMarkerColor(colors[ic % len(colors)])
+		graph.SetMarkerSize(1)
+		graph.SetMarkerStyle(markers[(ic / len(colors)) % len(markers)])
+		leg.AddEntry(graph,"Step %d - %d" % (i,i-1), "ple")
 		ic+=1
 		mg.Add(graph)
 
-	mg.Draw("AL")
+	mg.Draw("ALP")
 	leg.Draw()
-	c.SaveAs(outdir + "/" + iRing[key].GetName() + ".png")
+	c.SaveAs(outdir + "/" + iRing[keys[0]].GetName() + ".png")
 
 for key in time1d:
 	time1d[key].Draw()
@@ -209,6 +214,7 @@ for key in time1d:
 
 for iz in [-1,0,1]:
 	keys = sorted([ (cut,iz) for cut,i in time if i == iz])
+	if not keys: continue
 	for i in range(1,len(keys)):
 		c.SetLogz(False)
 		customPalette()
