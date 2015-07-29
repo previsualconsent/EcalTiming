@@ -42,7 +42,8 @@ EcalTimingCalibProducer::EcalTimingCalibProducer(const edm::ParameterSet& iConfi
 	///\todo the min energy should be in ADC not in energy
 	_minRecHitEnergyStep(iConfig.getParameter<double>("minRecHitEnergyStep")),
 	_minRecHitEnergyNStep(iConfig.getParameter<double>("minRecHitEnergyNStep")),
-   _energyThesholdOffset(iConfig.getParameter<double>("energyThesholdOffset")),
+   _energyThresholdOffsetEB(iConfig.getParameter<double>("energyThresholdOffsetEB")),
+   _energyThresholdOffsetEE(iConfig.getParameter<double>("energyThresholdOffsetEE")),
 	_minEntries(iConfig.getParameter<unsigned int>("minEntries")),
 	_globalOffset(iConfig.getParameter<double>("globalOffset")),
 	_storeEvents(iConfig.getParameter<bool>("storeEvents")),
@@ -100,7 +101,7 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//check if rechit is valid
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
-	float energyThreshold = getEnergyThreshold(recHit.detid()) + _energyThesholdOffset;
+	float energyThreshold = getEnergyThreshold(recHit.detid()) ;
 	if( recHit.energy() < (energyThreshold)) return false; // minRecHitEnergy in ADC for EB
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
 

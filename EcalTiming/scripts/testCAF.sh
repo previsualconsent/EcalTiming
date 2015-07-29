@@ -6,7 +6,7 @@ RUNLIST="251244 251251 251252 251521 251522 251548 251559 251560 251561 251562"
 STREAM=AlCaPhiSym
 NEVENTS=-1
 QUEUE=2nd
-DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/round1
+DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/Cuts_EB1.5_EE2.5/
 CONFIG=test/ecalTime_fromAlcaStream_cfg.py
 
 FROMRECO=NO
@@ -88,14 +88,15 @@ do
 	i=0
 	for file in $filelist
 	do
-		runcommand="cmsRun ${CONFIG} files=${filelist} output=${OUTDIR}/ecalTiming-${RUN}-$i.root maxEvents=${NEVENTS} jsonFile=${jsonFile}"
+		name=${i}_${en}GeV
+		runcommand="cmsRun ${CONFIG} files=${filelist} output=${OUTDIR}/ecalTiming_${name}.root maxEvents=${NEVENTS} jsonFile=${jsonFile} minEnergyEB=1.5 minEnergyEE=2.5"
 		if [ "$BATCH" == "YES" ]
 		then
-			bsub -oo ${OUTDIR}/stdout-$i-${NEVENTS}.log -eo ${OUTDIR}/stderr-$i-${NEVENTS}.log -R "rusage[mem=4000]" -q ${QUEUE} "cd $PWD; eval \`scramv1 runtime -sh\`; 
+			bsub -oo ${OUTDIR}/stdout-${name}-${NEVENTS}.log -eo ${OUTDIR}/stderr-${name}-${NEVENTS}.log -R "rusage[mem=4000]" -q ${QUEUE} "cd $PWD; eval \`scramv1 runtime -sh\`; 
 			${runcommand}
 			" || exit 1
 		else
-			runcommand
+			$runcommand
 		fi
 		let i=i+1
 	done

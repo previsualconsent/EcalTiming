@@ -54,6 +54,14 @@ void EcalCrystalTimingCalibration::calcAllWithinNSigma(float n_sigma, float maxR
 	_sum3WithinNSigma[n_sigma] = 0.;
 	_numWithinNSigma[n_sigma] = 0.;
 
+	if(!_storingEvents) 
+	{
+		_sumWithinNSigma[n_sigma] = _sum;
+		_sum2WithinNSigma[n_sigma] = _sum2;
+		_sum3WithinNSigma[n_sigma] = 0;
+		_numWithinNSigma[n_sigma] = _num;
+	}
+
 	for(auto te : timingEvents) {
 		if(fabs(te.time() - mean()) < range) {
 			_sumWithinNSigma[n_sigma] += te.time();

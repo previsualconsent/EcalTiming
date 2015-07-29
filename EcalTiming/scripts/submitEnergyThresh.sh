@@ -86,20 +86,20 @@ do
 	
 	jsonFile=/afs/cern.ch/cms/CAF/CMSALCA/ALCA_ECALCALIB/json_ecalonly/251022-251562-Prompt-pfgEcal-noLaserProblem.json
 
-	for en in $(seq 0 .5 4.5)
+	for en in $(seq 2.5 .5 3.0)
 	do
 		i=0
 		for file in $filelist
 		do
 			name=${i}_${en}GeV
-			runcommand="cmsRun ${CONFIG} files=${filelist} output=${OUTDIR}/ecalTiming_${name}.root maxEvents=${NEVENTS} jsonFile=${jsonFile} minEnergy=${en}"
+			runcommand="cmsRun ${CONFIG} files=${filelist} output=${OUTDIR}/ecalTiming_${name}.root maxEvents=${NEVENTS} jsonFile=${jsonFile} minEnergyEB=${en} minEnergyEE=${en}"
 			if [ "$BATCH" == "YES" ]
 			then
 				bsub -oo ${OUTDIR}/stdout_${name}_${NEVENTS}.log -eo ${OUTDIR}/stderr_${name}_${NEVENTS}.log -R "rusage[mem=4000]" -q ${QUEUE} "cd $PWD; eval \`scramv1 runtime -sh\`; 
 				${runcommand}
 				" || exit 1
 			else
-				runcommand
+				$runcommand
 			fi
 			let i=i+1
 		done

@@ -168,7 +168,8 @@ private:
 	unsigned int _recHitMin; ///< require at least this many rec hits to count the event
 	double _minRecHitEnergyStep; ///< to check step size to check energy stability
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
-   double _energyThesholdOffset; ///< energy to add to the minimum energy thresholc
+   double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
+   double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
 	unsigned int _minEntries; ///< require a minimum number of entries in a ring to do averages
 	float        _globalOffset;    ///< time to subtract from every event
    bool _storeEvents;
@@ -221,7 +222,8 @@ private:
 	float getEnergyThreshold(const DetId detid)
 	{
 		int iRing = _ringTools.getRingIndexInSubdet(detid);
-		return detid.subdetId() == EcalBarrel ? 13 * 0.04 :  20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 ;
+		return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :  
+			20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
 	}
 	std::map<DetId, float>  _CrysEnergyMap;
 
