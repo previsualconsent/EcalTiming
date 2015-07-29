@@ -100,7 +100,7 @@ def addFitToPlot(h):
 
 
 def plotCCUs(tree, outdir, prefix=""):
-	c = ROOT.TCanvas("c","c",1600,900)
+	c = ROOT.TCanvas("c","c",1600,1200)
 	# dictionaries to store histograms
 	time = dict()
 	time_offset = dict()
@@ -130,8 +130,9 @@ def plotCCUs(tree, outdir, prefix=""):
 		print "%d\t%.3f"%(iz, offset[iz])
 
 	timing = dict()
-	from EcalTiming.EcalTiming.loadOldCalib import getCalib
+	from EcalTiming.EcalTiming.loadOldCalib import getCalib,getRawIDMap
 	oldCalib = getCalib()
+	rawidMap = getRawIDMap()
 
 	for event in tree:
 		if not counter % (tree.GetEntries()/10): print counter, '/', tree.GetEntries()
@@ -176,34 +177,19 @@ def plotCCUs(tree, outdir, prefix=""):
 		CCU[event.elecID].Fill(event.time - offset[iz])
 		time_abs[iz].Fill(x,y, event.time - offset[iz] - oldCalib[event.rawid])
 
+	ccu_adj = {(54, 19): 4.0, (54, 20): 4.0, (48,  1): 2.0, (48,  2): 1.0, (48,  7): 2.0, (48,  5): 2.0, (48,  6): 1.0, (48,  3): 1.0, (48,  8): 1.0, (48,  4): 2.0, ( 1, 19): 4.0}
+
 	print "CCU shifts"
-	done = set()
-	ccu_cut = {0:1.04, 1:1.0, -1:1.0}
-	for ix,iy,iz,rawid in elec_map:
-		id = elec_map[(ix,iy,iz,rawid)]
-		if iz == 0:
-			x = iy
-			y = ix
-		else:
-			x = ix
-			y = iy
-		t = CCU[id].GetMean()
-		err = CCU[id].GetStdDev()
-		CCU_maps[iz].Fill(x,y,t)
-		CCU_err_maps[iz].Fill(x,y,err)
-		ccu_unit = 25./24.
-		time_in_ccu_unit = t / ccu_unit
-		if abs(time_in_ccu_unit) > ccu_cut[iz] and err < 1.0:
-			t_offset_ccu = round(time_in_ccu_unit) * ccu_unit
-			CCU_maps_cut[iz].Fill(x,y,t_offset_ccu)
-
-		if id not in done:
-			done.add(id)
-			CCU1d[iz].Fill(t)
-			if abs(time_in_ccu_unit) > ccu_cut[iz] and err < 1.0:
-				print iz, ix, iy, id >> 7, id & 2**8-1, round(t/ccu_unit)
-
-
+	unit = 25./24.
+	for id,crys in rawidMap.iteritems():
+		if(crys.FED,crys.CCU) in ccu_adj:
+			if crys.iz == 0:
+				x = crys.iy
+				y = crys.ix
+			else:
+				x = crys.ix
+				y = crys.iy
+			CCU_maps_cut[crys.iz].Fill(x,y,ccu_adj[(crys.FED,crys.CCU)])
 
 	r = 3
 	for key in CCU_maps:

@@ -36,7 +36,7 @@ def initMap(name, title, iz):
 	return h
 
 
-def inittime1d(name, title, iz):
+def inittime1d(name, title, iz, low=-10, hi=10):
 	if iz == 0:
 		det = "EB_"
 	elif iz == -1:
@@ -46,13 +46,13 @@ def inittime1d(name, title, iz):
 	else:
 		#print "bad iz value", iz
 		det = str(iz)
-	h = ROOT.TH1F(det + name, title, 50, -10, 10)
+	h = ROOT.TH1F(det + name, title, 50, low, hi)
 	h.SetXTitle("Time [ns]")
 	h.SetYTitle("Events")
 	return h
 
 
-def initiRing(name, title, iz):
+def initiRing(name, title, iz, xtitle="iRing", ytitle="Mean Time [ns]"):
 	if iz == 0:
 		h = ROOT.TProfile("EB_" + name, title, 171, -85, 86)
 	elif iz == -1:
@@ -62,8 +62,8 @@ def initiRing(name, title, iz):
 	else:
 		print "bad iz value", iz
 		return None
-	h.SetXTitle("iRing")
-	h.SetYTitle("Mean Time [ns]")
+	h.SetXTitle(xtitle)
+	h.SetYTitle(ytitle)
 	return h
 
 def initEvsT(name, title, iz):
@@ -81,13 +81,14 @@ def initEvsT(name, title, iz):
 	h.SetYTitle("Time [ns]")
 	return h
 
-def initHists(prefix,hist_dict, init_func, key, name, title):
+def initHists(prefix,hist_dict, init_func, key, name, title,**kwargs):
 	if key in hist_dict:
 		return
 	iz = key
-	hist_dict[key] = init_func(prefix + name, title, iz)
+	hist_dict[key] = init_func(prefix + '_' + name, title, iz, **kwargs)
 
-def addFitToPlot(h):
+def addFitToPlot(h,outfilename):
+	c = ROOT.TCanvas("c","c",1600,1200)
 	fit = ROOT.TF1("gaus","gaus")
 	h.Fit(fit, "Q")
 	mu = fit.GetParameter(1)
@@ -96,19 +97,21 @@ def addFitToPlot(h):
 	label.AddText("#mu = %.3f" % mu)
 	label.AddText("#sigma = %.3f" % sigma)
 	label.Draw()
+	c.SaveAs(outfilename)
 	return mu,sigma
 
 
 def plotMaps(tree, outdir, prefix=""):
-	c = ROOT.TCanvas("c","c",1600,900)
 	# dictionaries to store histograms
 	time = dict()
 	time_rel2012 = dict()
 	timeError = dict()
+	timeError1d = dict()
 	stdDev = dict()
 	occupancy = dict()
 	energy = dict()
 	iRing = dict()
+	iRingError = dict()
 	time1d = dict()
 	EvsT = dict()
 
@@ -125,8 +128,7 @@ def plotMaps(tree, outdir, prefix=""):
 	for iz in detectors:
 		tree.Draw("time>>temp%d(50,-5,5)" % iz,"iz == %d && num != 0" % iz)
 		h = ROOT.gDirectory.FindObject("temp%d" % iz)
-		offset[iz],__ = addFitToPlot(h)
-		c.SaveAs(outdir + '/' + detectors[iz] + "_1d_noffset.png")
+		offset[iz],__ = addFitToPlot(h,outdir + '/' + detectors[iz] + '_' + prefix + "_1d_noffset.png")
 
 	from EcalTiming.EcalTiming.loadOldCalib import getCalib
 	oldCalib = getCalib()
@@ -150,12 +152,14 @@ def plotMaps(tree, outdir, prefix=""):
 		initHists(prefix,time, initMap, key, "time", "Time [ns]")
 		initHists(prefix,time_rel2012, initMap, key, "time_rel2012", "Time - old calib [ns]")
 		initHists(prefix,timeError, initMap, key, "timeError", "Time Error[ns]")
+		initHists(prefix,timeError1d, inittime1d, key, "timeError1d", "Time Error Test [ns]", low=0, hi=.2)
 		initHists(prefix,stdDev, initMap, key, "stdDev", "Std Dev [ns]")
 		initHists(prefix,time1d, inittime1d, key, "time1d", "time1d")
 
 		initHists(prefix,occupancy, initMap, key, "occupancy", "Occupancy")
 		initHists(prefix,energy, initMap, key, "energy", "Energy [GeV]")
 		initHists(prefix,iRing, initiRing, key, "iRing", "iRing")
+		initHists(prefix,iRingError, initiRing, key, "iRingError", "iRingError", xtitle="iRing", ytitle="Mean Time Error [ns]")
 		initHists(prefix,EvsT, initEvsT, key, "EvsT", "EvsT")
 
 		initHists(prefix,CCU, inittime1d, (event.elecID), "ccu_time", " CCU Time [ns]")
@@ -177,6 +181,7 @@ def plotMaps(tree, outdir, prefix=""):
 
 		time[key].Fill(x, y, t)
 		timeError[key].Fill(x, y, event.timeError)
+		timeError1d[key].Fill(event.timeError)
 		stdDev[key].Fill(x, y, event.timeError  * math.sqrt(event.num))
 		time1d[key].Fill(t)
 
@@ -184,6 +189,7 @@ def plotMaps(tree, outdir, prefix=""):
 		energy[key].Fill(x, y, event.energy)
 		EvsT[key].Fill(event.energy, t)
 		iRing[key].Fill(event.iRing, t)
+		iRingError[key].Fill(event.iRing, event.timeError)
 
 		CCU[event.elecID].Fill(t)
 
@@ -203,18 +209,21 @@ def plotMaps(tree, outdir, prefix=""):
 		CCU_maps[iz].Fill(x,y,CCU[elec_map[(ix,iy,iz)]].GetMean())
 		CCU_err_maps[iz].Fill(x,y,CCU[elec_map[(ix,iy,iz)]].GetStdDev())
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in CCU_maps:
 		CCU_maps[key].SetAxisRange(-2, 2, "Z")
 		CCU_maps[key].SetZTitle("[ns]")
 		CCU_maps[key].Draw("colz")
 		c.SaveAs(outdir + "/" + CCU_maps[key].GetName() + ".png")
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in CCU_err_maps:
 		CCU_err_maps[key].SetAxisRange(0, 2, "Z")
 		CCU_err_maps[key].SetZTitle("[ns]")
 		CCU_err_maps[key].Draw("colz")
 		c.SaveAs(outdir + "/" + CCU_err_maps[key].GetName() + ".png")
 		
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in time:
 		time[key].SetAxisRange(-10, 10, "Z")
 		time[key].SetZTitle("[ns]")
@@ -227,24 +236,37 @@ def plotMaps(tree, outdir, prefix=""):
 		time[key].Draw("colz")
 		c.SaveAs(outdir + "/" + time[key].GetName() + ".2.png")
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in time_rel2012:
 		time_rel2012[key].SetAxisRange(-10, 10, "Z")
 		time_rel2012[key].SetZTitle("[ns]")
 		time_rel2012[key].Draw("colz")
 		c.SaveAs(outdir + "/" + time_rel2012[key].GetName() + ".png")
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in timeError:
 		timeError[key].SetAxisRange(0, .2, "Z")
 		timeError[key].SetZTitle("[ns]")
 		timeError[key].Draw("colz")
 		c.SaveAs(outdir + "/" + timeError[key].GetName() + ".png")
+		
+	ROOT.gStyle.SetOptStat(1100)
+	c = ROOT.TCanvas("c","c",1600,1200)
+	for key in timeError1d:
+		timeError1d[key].SetStats(True)
+		timeError1d[key].Draw()
+		print timeError1d[key].GetMean(), timeError1d[key].GetRMS()
+		c.SaveAs(outdir + "/" + timeError1d[key].GetName() + ".png")
 
+	ROOT.gStyle.SetOptStat(0)
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in stdDev:
 		stdDev[key].SetAxisRange(0, 3, "Z")
 		stdDev[key].SetZTitle("[ns]")
 		stdDev[key].Draw("colz")
 		c.SaveAs(outdir + "/" + stdDev[key].GetName() + ".png")
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	c.SetLogz(True)
 	if occupancy:
 		occu_max = max( [ occupancy[key].GetMaximum() for key in occupancy])
@@ -254,7 +276,7 @@ def plotMaps(tree, outdir, prefix=""):
 		occupancy[key].Draw("colz")
 		c.SaveAs(outdir + "/" + occupancy[key].GetName() + ".png")
 
-	c.SetLogz(False)
+	c = ROOT.TCanvas("c","c",1600,1200)
 	if energy:
 		en_max = max( [ energy[key].GetMaximum() for key in energy])
 	en_max = 5.0
@@ -264,21 +286,30 @@ def plotMaps(tree, outdir, prefix=""):
 		energy[key].SetZTitle("[GeV]")
 		c.SaveAs(outdir + "/" + energy[key].GetName() + ".png")
 
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in iRing:
 		graph = ROOT.TGraphErrors(iRing[key])
 		graph.Draw("AP")
 		iRing[key].Draw()
 		c.SaveAs(outdir + "/" + iRing[key].GetName() + ".png")
+
+	for key in iRingError:
+		graph = ROOT.TGraphErrors(iRingError[key])
+		graph.Draw("AP")
+		iRingError[key].Draw()
+		c.SaveAs(outdir + "/" + iRingError[key].GetName() + ".png")
 	
+	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in EvsT:
 		EvsT[key].Draw("colz")
 		c.SaveAs(outdir + "/" + EvsT[key].GetName() + ".png")
 
-	ROOT.gStyle.SetOptStat(1111)
+	c = ROOT.TCanvas("c","c",1600,1200)
+	ROOT.gStyle.SetOptStat(1100)
 	for key in time1d:
+		time1d[key].SetStats(True)
 		time1d[key].Draw()
-		addFitToPlot(time1d[key])
-		c.SaveAs(os.path.join(outdir, time1d[key].GetName() + ".png"))
+		addFitToPlot(time1d[key],os.path.join(outdir, time1d[key].GetName() + ".png"))
 	
 	return time
 
@@ -286,7 +317,9 @@ if __name__ == "__main__":
 
 	customROOTstyle()
 	ROOT.gROOT.SetBatch(True)
+	print sys.argv
 	filename = sys.argv[1]
+	prefix = sys.argv[2]
 
 	#if len(sys.argv) > 1:
 	#	outdir = sys.argv[1]
@@ -311,5 +344,5 @@ if __name__ == "__main__":
 
 	file = ROOT.TFile.Open(filename)
 	tree = file.Get("filter/EcalSplashTiming/timingTree")
-	time = plotMaps(tree, outdir, )
+	time = plotMaps(tree, outdir, prefix = prefix)
 
