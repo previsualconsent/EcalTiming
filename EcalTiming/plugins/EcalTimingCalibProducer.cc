@@ -407,7 +407,7 @@ void EcalTimingCalibProducer::dumpCalibration(std::string filename)
 
 	for(unsigned int i = 0; i < _timeCalibConstants.endcapItems().size(); ++i) {
 		EEDetId id(EEDetId::detIdFromDenseIndex(i)); // this is a stupid thing that I'm obliged to do due to the stupid structure of the ECAL container
-		fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[i] << std::endl;
+		fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[i] << "\t" << id.rawId() << std::endl;	
 	}
 	fout.close();
 }
