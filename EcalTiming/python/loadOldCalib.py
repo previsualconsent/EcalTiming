@@ -171,10 +171,12 @@ def plotiRing(map, dir, name):
 	
 	return hists
 	
-def plot2d(map, dir, name, low, hi):
+def plot2d(map, dir, name, low, hi,setLogz=False):
 	global rawidMap
 
 	c = ROOT.TCanvas("c","c",1600,1200)
+	if setLogz:
+		c.SetLogz()
 	hists = dict()
 	hists[0] = ROOT.TProfile2D("EB_" + name, 'EB ' + name,  360, 1, 361, 171, -85, 86)
 	hists[0].SetXTitle("i#phi")
@@ -186,6 +188,7 @@ def plot2d(map, dir, name, low, hi):
 	hists[1].SetXTitle("ix")
 	hists[1].SetYTitle("iy")
 	for id,time in map.iteritems():
+		if id not in rawidMap: continue
 		crys = rawidMap[id]
 		if crys.iz == 0:
 			x = crys.iy
