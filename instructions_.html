@@ -83,8 +83,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 cd CMSSW_7_4_2/src
 cmsenv
 git cms-merge-topic shervin86:iRingInSubdet
-git clone  git@github.com:ECALELFS/EcalTiming.git
-git clone  git@github.com:ECALELFS/PhiSym.git
+git clone  git@github.com:previsualconsent/EcalTiming.git
+cd EcalTiming
+checkout energystability
 scram b -j16
 </pre><p>Check if you have astyle command installed: </p>
 <pre class="fragment">which astyle
@@ -101,7 +102,7 @@ cd -
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2015 19:36:04 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2015 20:02:35 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
