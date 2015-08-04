@@ -1,0 +1,4 @@
+<map id="EcalCrystalTimingCalibration::getMeanWithinNSigma" name="EcalCrystalTimingCalibration::getMeanWithinNSigma">
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#a5b5b1df8a43ba47e838375fd917aa3b5" title="calculate sum, sum2, sum3, n for time if time within n x stdDev and store the result ..." alt="" coords="245,5,437,48"/>
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#a6a0685fed9b017364a5806e08cf656d4" title="average time (mean of the time distribution) " alt="" coords="485,5,677,48"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="EcalCrystalTimingCalibration::getMeanWithinNSigma" name="EcalCrystalTimingCalibration::getMeanWithinNSigma">
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="dump the callibratoin to the tree " alt="" coords="728,41,920,84"/>
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="487,37,679,80"/>
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="245,92,437,135"/>
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="485,104,680,147"/>
+</map>

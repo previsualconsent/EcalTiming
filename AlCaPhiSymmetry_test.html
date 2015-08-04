@@ -63,7 +63,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
      onmouseover="return searchBox.OnSearchSelectShow()"
      onmouseout="return searchBox.OnSearchSelectHide()"
      onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Friends</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
+<a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(0)"><span class="SelectionMark">&#160;</span>All</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(1)"><span class="SelectionMark">&#160;</span>Classes</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(2)"><span class="SelectionMark">&#160;</span>Functions</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(3)"><span class="SelectionMark">&#160;</span>Variables</a><a class="SelectItem" href="javascript:void(0)" onclick="searchBox.OnSelectItem(4)"><span class="SelectionMark">&#160;</span>Pages</a></div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
@@ -78,12 +78,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 How to test the code on the AlCaPhiSymmetry stream files</h1>
 <p>Testing file: </p>
 <pre class="fragment">file=root://eoscms//eos/cms/store/data/Run2015A/AlCaPhiSym/RAW/v1/000/246/908/00000/C0DA4527-2F0A-E511-ADFD-02163E014349.root
-cmsRun test/ecalTimeTreeMaker_FromRaw_CosmicOrBeamSplash_cfg.py files=root://eoscms/$file
-</pre><p>The code is in debug mode that have to be switched off </p>
+cmsRun test/ecalTime_fromAlcaStream_cfg.py files=root://eoscms/$file
+</pre><h2>Options for <code>cmsRun test/ecalTime_fromAlcaStream_cfg.py</code></h2>
+<table class="doxtable">
+<tr>
+<th>Options </th><th>Default </th><th>Description  </th></tr>
+<tr>
+<td>files </td><td>"" </td><td>input files (can be RAW if step contains "RECO") </td></tr>
+<tr>
+<td>output </td><td>"" </td><td>output files. If TIME in step, it contains the calibration trees, otherwise it will be the RECO files. </td></tr>
+<tr>
+<td>maxEvents </td><td>-1 </td><td># of events to run over </td></tr>
+<tr>
+<td>jsonFile </td><td>"" </td><td>path to the json file which designates which lumisections to use </td></tr>
+<tr>
+<td>step </td><td>"RECOTIMEANALYSIS" </td><td>Do reco, time analysis or both, RECO or TIMEANALYSIS or RECOTIMEANALYSIS </td></tr>
+<tr>
+<td>offset </td><td>0.0 </td><td>add this to each crystal time, (this was used in splash analysis, should probably be removed) </td></tr>
+<tr>
+<td>minEnergyEB </td><td>0.0 </td><td>add this to minimum energy threshold in EB (0.520 GeV) </td></tr>
+<tr>
+<td>minEnergyEE </td><td>0.0 </td><td>add this to minimum energy threshold in EE (which is a function of iRing) </td></tr>
+<tr>
+<td>isSplash </td><td>0 </td><td>0=false, 1=true, performs RECO as splash data and shifts timing in analyzer by TOF difference </td></tr>
+<tr>
+<td>streamName </td><td>"AlCaPhiSym" </td><td>type of stream, changes RECO path: AlCaPhiSym or AlCaP0 </td></tr>
+</table>
+<p>The script <code>scripts/testCAF.sh</code> automatically can run over RAW files for specific runs. Probably should use it as a template rather than running it as is. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 5 2015 18:18:09 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2015 19:36:04 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
