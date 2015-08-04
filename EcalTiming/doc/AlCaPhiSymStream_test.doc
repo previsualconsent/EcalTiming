@@ -5,8 +5,24 @@
 Testing file:
 \verbatim
 file=root://eoscms//eos/cms/store/data/Run2015A/AlCaPhiSym/RAW/v1/000/246/908/00000/C0DA4527-2F0A-E511-ADFD-02163E014349.root
-cmsRun test/ ecalTime_fromAlcaStream_cfg.py files=root://eoscms/$file
+cmsRun test/ecalTime_fromAlcaStream_cfg.py files=root://eoscms/$file
 \endverbatim
 
-The code is in debug mode that have to be switched off
+## Options for `cmsRun test/ecalTime_fromAlcaStream_cfg.py`
+Options | Default | Description
+------- | ------- | -------
+files | "" | input files (can be RAW if step contains "RECO")
+output | "" | output files. If TIME in step, it contains the calibration trees, otherwise it will be the RECO files.
+maxEvents | -1 | # of events to run over
+jsonFile |"" | path to the json file which designates which lumisections to use
+step |"RECOTIMEANALYSIS" | Do reco, time analysis or both, RECO or TIMEANALYSIS or RECOTIMEANALYSIS
+offset |0.0 | add this to each crystal time, (this was used in splash analysis, should probably be removed)
+minEnergyEB | 0.0 | add this to minimum energy threshold in EB (0.520 GeV)
+minEnergyEE | 0.0 | add this to minimum energy threshold in EE (which is a function of iRing)
+isSplash    |  0  | 0=false, 1=true, performs RECO as splash data and shifts timing in analyzer by TOF difference
+streamName | "AlCaPhiSym" | type of stream, changes RECO path: AlCaPhiSym or AlCaP0
+
+
+The script `scripts/testCAF.sh` automatically can run over RAW files for specific runs, setting the options above appropriately.
+Probably should use it as a template rather than running it as is. 
 */
