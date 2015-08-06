@@ -210,7 +210,10 @@ process.load("Geometry.EcalMapping.EcalMappingRecord_cfi")
 
 #ESLooperProducer looper is imported here:
 process.load('EcalTiming.EcalTiming.ecalTimingCalibProducer_cfi')
+process.load('EcalTiming.EcalTiming.RecHitsSelector_cfi')
 
+process.timing.recHitEBCollection = cms.InputTag("recHitsEBSelector")
+process.timing.recHitEECollection = cms.InputTag("recHitsEESelector")
 process.timing.isSplash= cms.bool(True if options.isSplash else False)
 process.timing.makeEventPlots=evtPlots
 process.timing.globalOffset = cms.double(options.offset)
@@ -221,9 +224,10 @@ process.timing.storeEvents = cms.bool(True)
 
 
 process.analysis = cms.Sequence( process.timing )
-process.reco = cms.Sequence( process.filter 
+process.reco = cms.Sequence( (process.filter 
                       + process.digiStep 
-                      + process.reco_step
+                      + process.reco_step)
+                      * (process.recHitsEBSelector + process.recHitsEESelector)
                       )
 
 
