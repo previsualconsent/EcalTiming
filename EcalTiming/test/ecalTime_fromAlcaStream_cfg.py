@@ -166,7 +166,7 @@ if(len(options.jsonFile) > 0):
 process.RECOoutput = cms.OutputModule("PoolOutputModule",
 splitLevel = cms.untracked.int32(0),
 eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-outputCommands = cms.untracked.vstring('drop *',"keep *_ecalRecHit_EcalRecHits*_*"),
+outputCommands = cms.untracked.vstring('drop *',"keep *_ecalRecHitE*Selector_*_*"),
 fileName = cms.untracked.string(options.output),
 dataset = cms.untracked.PSet(
    filterName = cms.untracked.string(''),
@@ -212,8 +212,8 @@ process.load("Geometry.EcalMapping.EcalMappingRecord_cfi")
 process.load('EcalTiming.EcalTiming.ecalTimingCalibProducer_cfi')
 process.load('EcalTiming.EcalTiming.RecHitsSelector_cfi')
 
-process.timing.recHitEBCollection = cms.InputTag("recHitsEBSelector")
-process.timing.recHitEECollection = cms.InputTag("recHitsEESelector")
+process.timing.recHitEBCollection = cms.InputTag("ecalRecHitEBSelector")
+process.timing.recHitEECollection = cms.InputTag("ecalRecHitEESelector")
 process.timing.isSplash= cms.bool(True if options.isSplash else False)
 process.timing.makeEventPlots=evtPlots
 process.timing.globalOffset = cms.double(options.offset)
@@ -227,7 +227,7 @@ process.analysis = cms.Sequence( process.timing )
 process.reco = cms.Sequence( (process.filter 
                       + process.digiStep 
                       + process.reco_step)
-                      * (process.recHitsEBSelector + process.recHitsEESelector)
+                      * (process.ecalRecHitEBSelector + process.ecalRecHitEESelector)
                       )
 
 
