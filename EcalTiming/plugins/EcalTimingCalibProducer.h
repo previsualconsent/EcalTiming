@@ -149,9 +149,14 @@ public:
 	~EcalTimingCalibProducer();                        // default destructor
 
 
-   virtual void beginJob() override;
+        virtual void beginJob() override;
 	virtual bool filter(edm::Event&, const edm::EventSetup&) override;
-   virtual void endJob() override;
+        virtual void endJob() override;
+        
+        int OccupancyEB[171][361]  = {{0}}; //added occupancy plots
+        int OccupancyEEM[101][101] = {{0}};
+        int OccupancyEEP[101][101] = {{0}};
+
 private:
 	// ----------member data ---------------------------
 	/** @name Input Parameters
@@ -170,6 +175,8 @@ private:
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
    double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
    double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
+   double _chi2ThresholdOffsetEB; //chi2 square thr for the Barrel --- Added
+   double _chi2ThresholdOffsetEE; //chi2 square thr for the Endcap --- Added
 	unsigned int _minEntries; ///< require a minimum number of entries in a ring to do averages
 	float        _globalOffset;    ///< time to subtract from every event
    bool _storeEvents;
@@ -219,11 +226,20 @@ private:
 	{
 		return (elecMap_->getElectronicsId(id).rawId() >> 6) & 0x3FFF;
 	}
-	float getEnergyThreshold(const DetId detid)
+	//float getEnergyThreshold(const DetId detid)
+        std::pair <float, float> getEnergyThreshold(const DetId detid)
 	{
 		int iRing = _ringTools.getRingIndexInSubdet(detid);
-		return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :  
-			20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
+                //std::pair <float, float> outputThr = detid.subdetId() == EcalBarrel ? {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB} : {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE}
+                std::pair <float, float> outputThr;
+                if (detid.subdetId() == EcalBarrel){
+                  outputThr = {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB};
+                }else{
+                  outputThr = {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE};
+                }
+		//return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :  
+		//	20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
+                return outputThr;
 	}
 	std::map<DetId, float>  _CrysEnergyMap;
 
@@ -279,11 +295,17 @@ private:
 	TH2F* RechitEnergyTimeEEM;
 	TH2F* RechitEnergyTimeEEP;
 
+        //Occupancy plots
+        TH2D* OccupancyEB_;
+        TH2D* OccupancyEEM_;
+        TH2D* OccupancyEEP_;
+
 	EcalRingCalibrationTools _ringTools;
 	const CaloSubdetectorGeometry * endcapGeometry_;
 	const CaloSubdetectorGeometry * barrelGeometry_;
 
    const EcalElectronicsMapping * elecMap_;
+        int _event_tracker;
 
 	unsigned int _iter;
 };

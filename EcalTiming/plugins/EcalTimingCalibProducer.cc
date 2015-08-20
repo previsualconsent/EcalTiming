@@ -44,6 +44,8 @@ EcalTimingCalibProducer::EcalTimingCalibProducer(const edm::ParameterSet& iConfi
 	_minRecHitEnergyNStep(iConfig.getParameter<double>("minRecHitEnergyNStep")),
    _energyThresholdOffsetEB(iConfig.getParameter<double>("energyThresholdOffsetEB")),
    _energyThresholdOffsetEE(iConfig.getParameter<double>("energyThresholdOffsetEE")),
+   _chi2ThresholdOffsetEB(iConfig.getParameter<double>("chi2ThresholdOffsetEB")),//added
+   _chi2ThresholdOffsetEE(iConfig.getParameter<double>("chi2ThresholdOffsetEE")),//added
 	_minEntries(iConfig.getParameter<unsigned int>("minEntries")),
 	_globalOffset(iConfig.getParameter<double>("globalOffset")),
 	_storeEvents(iConfig.getParameter<bool>("storeEvents")),
@@ -81,6 +83,7 @@ void EcalTimingCalibProducer::beginJob()
 {
 	std::cout << "Begin job: createConstants" << std::endl;
 	//createConstants(iSetup);
+        _event_tracker = 0;  //Keep track of the event number
 
 	// Initialize histograms at start of Loop
 	char histDirName[100];
@@ -101,9 +104,27 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//check if rechit is valid
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
-	float energyThreshold = getEnergyThreshold(recHit.detid()) ;
-	if( recHit.energy() < (energyThreshold)) return false; // minRecHitEnergy in ADC for EB
+	//float energyThreshold = getEnergyThreshold(recHit.detid()) ; //changed
+        std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()) ;
+        //std::cout<<"Min Energy "<<energyThreshold.first<<" min chi2: "<<energyThreshold.second<<std::endl;
+	if( (recHit.energy() < (energyThreshold.first)) && (recHit.chi2()>energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
+
+        _event_tracker+=1;
+        if(_event_tracker%1000==0) std::cout<<"------ event passed: "<<_event_tracker<<" ------"<<std::endl;
+
+        //Adding occupancy part
+        if(recHit.detid().subdetId() == EcalBarrel){
+          EBDetId id(recHit.detid());
+          OccupancyEB[id.ieta()+85][id.iphi()]+=1;
+        }else{
+          EEDetId id(recHit.detid());
+          if(id.zside()<0){
+            OccupancyEEM[id.ix()][id.iy()]+=1;
+          }else{
+            OccupancyEEP[id.ix()][id.iy()]+=1;
+          }
+        }//end if for Barrrel-EndCap
 
 	// add the EcalTimingEvent to the EcalCreateTimeCalibrations
 	EcalTimingEvent timeEvent(recHit);
@@ -307,8 +328,9 @@ void EcalTimingCalibProducer::endJob()
 
 			// check if result is stable as function of energy
 			std::vector< std::pair<float, EcalCrystalTimingCalibration*> > energyStability;
-			float energyThreshold = getEnergyThreshold(calibRecHit_itr->first);
-			if(! calibRecHit_itr->second.isStableInEnergy(energyThreshold, energyThreshold + _minRecHitEnergyStep * _minRecHitEnergyNStep, _minRecHitEnergyStep, energyStability)) {
+			//float energyThreshold = getEnergyThreshold(calibRecHit_itr->first); //changed
+                        std::pair <float, float> energyThreshold = getEnergyThreshold(calibRecHit_itr->first);
+			if(! calibRecHit_itr->second.isStableInEnergy(energyThreshold.first, energyThreshold.first + _minRecHitEnergyStep * _minRecHitEnergyNStep, _minRecHitEnergyStep, energyStability)) {
 				ds |= DS_UNSTABLE_EN;
 			}
 			FillEnergyStabilityHists(calibRecHit_itr, energyStability);
@@ -357,6 +379,8 @@ void EcalTimingCalibProducer::endJob()
 
 	char filename[100];
 	sprintf(filename, "%s.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
+        std::cout<<"TEST"<<std::endl;
+        std::cout<<_outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()<<std::endl;
 	dumpCalibration(filename);
 	sprintf(filename, "%s-corr.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
 	dumpCorrections(filename);
@@ -434,6 +458,9 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 		RechitEneEB_->Fill(cal_itr->second.meanE());   // 1D histogram
 		RechitTimeEB_->Fill(cal_itr->second.getMeanWithinNSigma(2,10)); // 1D histogram
 
+                // Fill Occupancy histo
+                OccupancyEB_->Fill(id.ieta(),id.iphi(), OccupancyEB[id.ieta()+85][id.iphi()]);
+
 		ix = id.ieta();
 		iy = id.iphi();
 		iz = 0;
@@ -448,6 +475,9 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 
 			RechitEneEEM_->Fill(cal_itr->second.meanE());
 			RechitTimeEEM_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+
+                        OccupancyEEM_->Fill(id.ix(), id.iy(), OccupancyEEM[id.ix()][id.iy()]);
+
 		} else {
 			EneMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
 			TimeMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
@@ -455,6 +485,9 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 
 			RechitEneEEP_->Fill(cal_itr->second.meanE());
 			RechitTimeEEP_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+
+                        OccupancyEEP_->Fill(id.ix(), id.iy(), OccupancyEEP[id.ix()][id.iy()]);
+
 		}
 
 		ix = id.ix();
@@ -540,6 +573,8 @@ void EcalTimingCalibProducer::initEventHists(TFileDirectory fdir)
 //
 void EcalTimingCalibProducer::initHists(TFileDirectory fdir)
 {
+        std::cout<<"Initializing histos"<<std::endl;       
+
 	EneMapEB_ = fdir.make<TProfile2D>("EneMapEB", "RecHit Energy[GeV] EB profile map;i#eta; i#phi;E[GeV]", 171, -85, 86, 360, 1., 361.);
 	TimeMapEB_ = fdir.make<TProfile2D>("TimeMapEB", "Mean Time [ns] EB profile map; i#eta; i#phi;Time[ns]", 171, -85, 86, 360, 1., 361.);
 
@@ -571,11 +606,18 @@ void EcalTimingCalibProducer::initHists(TFileDirectory fdir)
 	HWTimeMapEEM_ = fdir.make<TProfile2D>("HWTimeMapEEM", "Mean HW Time[ns] profile map EE-;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
 	HWTimeMapEB_  = fdir.make<TProfile2D>("HWTimeMapEB",  "Mean HW Time[ns] EB profile map; i#eta; i#phi;Time[ns]", 171, -85, 86, 360, 1., 361.);
 
+        //Occupancy histograms
+
+        OccupancyEB_  = fdir.make<TH2D>("OccupancyEB", "Occupancy EB", 171, -85, 86, 361, 1., 361.);
+        OccupancyEEM_ = fdir.make<TH2D>("OccupancyEEM", "OccupancyEEM", 100, 1, 101, 100, 1, 101);
+        OccupancyEEP_ = fdir.make<TH2D>("OccupancyEEP", "OccupancyEEP", 100, 1, 101, 100, 1, 101);
+
 }
 
 //
 void EcalTimingCalibProducer::initTree(TFileDirectory fdir)
 {
+        std::cout<<"Initializing trees"<<std::endl;
 	dumpTree = fdir.make<TTree>("dumpTree", "");
 	timingTree = fdir.make<TTree>("timingTree", "");
 	energyStabilityTree = fdir.make<TTree>("energyStabilityTree", "");

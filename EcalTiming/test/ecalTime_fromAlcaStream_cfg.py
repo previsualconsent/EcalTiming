@@ -31,15 +31,25 @@ options.register('offset',
                  VarParsing.VarParsing.varType.float,
                  "add this to each crystal time")
 options.register('minEnergyEB',
-                 0.0,
+                 1.5,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
                  "add this to minimum energy threshold")
 options.register('minEnergyEE',
-                 0.0,
+                 3.0,
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.float,
                  "add this to minimum energy threshold")
+options.register('minChi2EB',
+                 50.0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "add this to minimum chi2 threshold")
+options.register('minChi2EE',
+                 50.0,
+                 VarParsing.VarParsing.multiplicity.singleton,
+                 VarParsing.VarParsing.varType.float,
+                 "add this to minimum chi2 threshold")
 options.register('isSplash',
                  0,
                  VarParsing.VarParsing.multiplicity.singleton,
@@ -66,7 +76,7 @@ elif(options.streamName=="AlCaPhiSym"): options.files = "/store/data/Commissioni
 else: 
     print "stream ",options.streamName," not foreseen"
     exit
-options.maxEvents = -1 # -1 means all events
+options.maxEvents = 1000000 # -1 means all events
 ### get and parse the command line arguments
 options.parseArguments()
 print options
@@ -244,6 +254,8 @@ if doAnalysis:
 	process.timing.outputDumpFile = process.TFileService.fileName
 	process.timing.energyThresholdOffsetEB = cms.double(options.minEnergyEB)
 	process.timing.energyThresholdOffsetEE = cms.double(options.minEnergyEE)
+	process.timing.chi2ThresholdOffsetEB = cms.double(options.minChi2EB)
+	process.timing.chi2ThresholdOffsetEE = cms.double(options.minChi2EE)
 	process.timing.storeEvents = cms.bool(True)
 	process.analysis = cms.Sequence( process.timing )
 
