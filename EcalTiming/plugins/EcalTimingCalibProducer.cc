@@ -105,7 +105,7 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
 	//float energyThreshold = getEnergyThreshold(recHit.detid()) ; //changed
-        std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()) ;
+        std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()); // first->energy threshold, second->chi2 threshold
         //std::cout<<"Min Energy "<<energyThreshold.first<<" min chi2: "<<energyThreshold.second<<std::endl;
 	if( (recHit.energy() < (energyThreshold.first)) && (recHit.chi2()>energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
@@ -379,7 +379,7 @@ void EcalTimingCalibProducer::endJob()
 
 	char filename[100];
 	sprintf(filename, "%s.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
-        std::cout<<"TEST"<<std::endl;
+        std::cout<<"Output Root File"<<std::endl;
         std::cout<<_outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()<<std::endl;
 	dumpCalibration(filename);
 	sprintf(filename, "%s-corr.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
