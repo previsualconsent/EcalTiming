@@ -1,5 +1,7 @@
 *.png
 *.root
 __init__.py
+*.old
+*processDump.py
 *.pyc
 html/*

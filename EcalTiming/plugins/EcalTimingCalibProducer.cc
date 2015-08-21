@@ -608,9 +608,9 @@ void EcalTimingCalibProducer::initHists(TFileDirectory fdir)
 
         //Occupancy histograms
 
-        OccupancyEB_  = fdir.make<TH2D>("OccupancyEB", "Occupancy EB", 171, -85, 86, 361, 1., 361.);
-        OccupancyEEM_ = fdir.make<TH2D>("OccupancyEEM", "OccupancyEEM", 100, 1, 101, 100, 1, 101);
-        OccupancyEEP_ = fdir.make<TH2D>("OccupancyEEP", "OccupancyEEP", 100, 1, 101, 100, 1, 101);
+        OccupancyEB_  = fdir.make<TH2D>("OccupancyEB", "Occupancy EB; i#eta; i#phi; #Hits", 171, -85, 86, 361, 1., 361.);
+        OccupancyEEM_ = fdir.make<TH2D>("OccupancyEEM", "OccupancyEEM; iy; ix; #Hits", 100, 1, 101, 100, 1, 101);
+        OccupancyEEP_ = fdir.make<TH2D>("OccupancyEEP", "OccupancyEEP; iy; ix; #Hits", 100, 1, 101, 100, 1, 101);
 
 }
 

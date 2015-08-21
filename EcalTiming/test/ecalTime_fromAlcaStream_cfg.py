@@ -76,7 +76,7 @@ elif(options.streamName=="AlCaPhiSym"): options.files = "/store/data/Commissioni
 else: 
     print "stream ",options.streamName," not foreseen"
     exit
-options.maxEvents = 1000000 # -1 means all events
+options.maxEvents = 100000 # -1 means all events
 ### get and parse the command line arguments
 options.parseArguments()
 print options
@@ -217,14 +217,40 @@ if doAnalysis:
 ### NumBer of events
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 
+#DUMMY RECHIT
+process.dummyHits = cms.EDProducer('DummyRechitDigis',
+                                    doDigi = cms.untracked.bool(True),
+                                    # rechits
+                                    barrelHitProducer      = cms.InputTag('hltAlCaPi0EBUncalibrator','pi0EcalRecHitsEB' ,'HLT'),
+                                    endcapHitProducer      = cms.InputTag('hltAlCaPi0EEUncalibrator','pi0EcalRecHitsEE' ,'HLT'),
+                                    barrelRecHitCollection = cms.untracked.string('dummyBarrelRechits'),
+                                    endcapRecHitCollection = cms.untracked.string('dummyEndcapRechits'),
+                                    # digis
+                                    barrelDigis            = cms.InputTag("hltAlCaPi0EBRechitsToDigis","pi0EBDigis","HLT"),
+                                    endcapDigis            = cms.InputTag("hltAlCaPi0EERechitsToDigis","pi0EEDigis","HLT"),
+                                    barrelDigiCollection   = cms.untracked.string('dummyBarrelDigis'),
+                                    endcapDigiCollection   = cms.untracked.string('dummyEndcapDigis'))
 
 process.filter=cms.Sequence()
 if(options.isSplash==1):
     process.filter+=process.spashesHltFilter
     process.reco_step = cms.Sequence(process.caloCosmicOrSplashRECOSequence)
 else:
-    #process.reco_step = cms.Sequence(process.reconstruction_step_multiFit)
-    process.reco_step = cms.Sequence(process.ecalLocalRecoSequenceAlCaStream)
+    if(options.streamName=="AlCaP0"):
+      from RecoLocalCalo.Configuration.ecalLocalRecoSequence_cff import *
+      #process.reco_step = cms.Sequence(ecalMultiFitUncalibRecHit *
+      #                                    ecalRecHit)
+      ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag('dummyHits','dummyBarrelDigis')#,'piZeroAnalysis')
+      ecalMultiFitUncalibRecHit.EEdigiCollection = cms.InputTag('dummyHits','dummyEndcapDigis')#,'piZeroAnalysis')
+      ecalRecHit.killDeadChannels = False
+      ecalRecHit.recoverEBFE = False
+      process.reco_step = cms.Sequence(process.dummyHits
+                                      + process.ecalMultiFitUncalibRecHit
+                                      + process.ecalRecHit)
+    else:
+      #process.reco_step = cms.Sequence(process.reconstruction_step_multiFit)
+      process.reco_step = cms.Sequence(process.ecalLocalRecoSequenceAlCaStream)
+      
 
 ### Process Full Path
 if(options.isSplash==0):
