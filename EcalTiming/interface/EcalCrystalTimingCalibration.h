@@ -16,6 +16,7 @@
 #define DS_RING         0x08
 #define DS_CRYS     		0x10
 
+void dumpAllToTree(TTree * tree, int ix_, int iy_, int iz_, float time_, float energy_, float chiSquare_, float thrApplied_);
 
 class EcalCrystalTimingCalibration
 {
@@ -112,6 +113,7 @@ public:
 
 	void dumpToTree(TTree *tree, int ix_, int iy_, int iz_, unsigned int status_, unsigned int elecID_, int iRing_); ///< dump the full set of events in a TTree:  need an empty tree
 	void dumpCalibToTree(TTree * tree, int rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) const; ///< dump the callibratoin to the tree
+        //void dumpAllToTree(TTree * tree, int ix_, int iy_, int iz_, float time_, float energy_, float chiSquare_, float thrApplied_);
 
 	/// checks if the time measurement is stable changing the min energy threshold
 	bool isStableInEnergy(float min, float max, float step, std::vector< std::pair<float, EcalCrystalTimingCalibration*> > &ret);

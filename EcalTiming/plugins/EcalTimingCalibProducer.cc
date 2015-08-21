@@ -111,20 +111,25 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
 
         _event_tracker+=1;
-        if(_event_tracker%1000==0) std::cout<<"------ event passed: "<<_event_tracker<<" ------"<<std::endl;
+        if(_event_tracker%10000==0) std::cout<<"------ event passed: "<<_event_tracker<<" ------"<<std::endl;
 
         //Adding occupancy part
         if(recHit.detid().subdetId() == EcalBarrel){
           EBDetId id(recHit.detid());
           OccupancyEB[id.ieta()+85][id.iphi()]+=1;
+          dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
         }else{
           EEDetId id(recHit.detid());
+          int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
+          dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
           if(id.zside()<0){
             OccupancyEEM[id.ix()][id.iy()]+=1;
           }else{
             OccupancyEEP[id.ix()][id.iy()]+=1;
           }
-        }//end if for Barrrel-EndCap
+        }//end if for Barrel-EndCap
+
+        //dumpAllToTree(infoTree, 0,0,0,0,0,0,0);
 
 	// add the EcalTimingEvent to the EcalCreateTimeCalibrations
 	EcalTimingEvent timeEvent(recHit);
@@ -312,6 +317,13 @@ void EcalTimingCalibProducer::endJob()
 	// remove the entries OOT (time > n_sigma)
 	float n_sigma = 2.; /// \todo remove hard coded number
 	for(auto calibRecHit_itr = _timeCalibMap.begin(); calibRecHit_itr != _timeCalibMap.end(); ++calibRecHit_itr) {
+              /*  if(calibRecHit_itr->first.subdetId() == EcalBarrel){
+                  EBDetId ID(calibRecHit_itr->first());
+                  calibRecHit_itr->second.dumpAllToTree(infoTree, ID.ieta(),ID.iphi(), 0, ID.time(), ID.energy(), ID.chi2(),13 * 0.04  + _energyThresholdOffsetEB);
+                }else{
+                  EEDetId ID(calibRecHit_itr->first());
+                  calibRecHit_itr->second.dumpAllToTree(infoTree, ID.ix(),ID.iy(), ID.iz(), ID.time(), ID.energy(), ID.chi2(),13 * 0.04  + _energyThresholdOffsetEB);
+                }*/
 		FillCalibrationCorrectionHists(calibRecHit_itr); // histograms with shifts to be corrected at each step
 		FillHWCorrectionHists(calibRecHit_itr);
 		float correction =  - calibRecHit_itr->second.getMeanWithinNSigma(n_sigma, 10);  // to reject tails
@@ -621,6 +633,7 @@ void EcalTimingCalibProducer::initTree(TFileDirectory fdir)
 	dumpTree = fdir.make<TTree>("dumpTree", "");
 	timingTree = fdir.make<TTree>("timingTree", "");
 	energyStabilityTree = fdir.make<TTree>("energyStabilityTree", "");
+        infoTree = fdir.make<TTree>("infoTree", "");
 }
 
 //define this as a plug-in

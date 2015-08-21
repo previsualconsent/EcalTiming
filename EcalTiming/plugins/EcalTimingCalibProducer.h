@@ -241,6 +241,7 @@ private:
 		//	20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
                 return outputThr;
 	}
+
 	std::map<DetId, float>  _CrysEnergyMap;
 
 	edm::Service<TFileService> fileService_;
@@ -249,6 +250,7 @@ private:
 	TTree *dumpTree;
 	TTree * timingTree;
 	TTree * energyStabilityTree;
+        TTree * infoTree;
 
 	// Mean Histograms
 

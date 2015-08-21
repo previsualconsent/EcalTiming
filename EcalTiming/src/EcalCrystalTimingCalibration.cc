@@ -224,3 +224,51 @@ void EcalCrystalTimingCalibration::dumpToTree(TTree *tree, int ix_, int iy_, int
 	}
 }
 
+
+//added!!!
+//void EcalCrystalTimingCalibration::dumpAllToTree(TTree *tree, int ix_, int iy_, int iz_, float time_, float energy_, float chiSquare_, float thrApplied_) 
+void dumpAllToTree(TTree *tree, int ix_, int iy_, int iz_, float time_, float energy_, float chiSquare_, float thrApplied_) 
+{
+    //casting variables
+    Short_t ix(ix_);
+    UShort_t iy(iy_);
+    Short_t iz(iz_);
+
+    if(tree->GetBranch("ix")==NULL) tree->Branch("ix", &ix, "ix/S");
+    else tree->SetBranchAddress("ix", &ix);
+
+    if(tree->GetBranch("iy")==NULL) tree->Branch("iy", &iy, "iy/s");
+    else tree->SetBranchAddress("iy", &iy);
+
+    if(tree->GetBranch("iz")==NULL) tree->Branch("iz", &iz, "iz/S");
+    else tree->SetBranchAddress("iz", &iz);
+
+    if(tree->GetBranch("time") == NULL) tree->Branch("time", &time_, "time/F");
+    else tree->SetBranchAddress("time", &time_);
+
+    if(tree->GetBranch("energy") == NULL) tree->Branch("energy", &energy_, "energy/F");
+    tree->SetBranchAddress("energy", &energy_);
+
+    if(tree->GetBranch("chi2") == NULL) tree->Branch("chi2", &chiSquare_, "chi2/F");
+    tree->SetBranchAddress("chi2", &chiSquare_);
+
+    if(tree->GetBranch("thr") == NULL) tree->Branch("thr", &thrApplied_, "thr/F");
+    tree->SetBranchAddress("thr", &thrApplied_);
+
+
+
+    tree->Fill();
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

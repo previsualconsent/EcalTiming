@@ -76,7 +76,7 @@ elif(options.streamName=="AlCaPhiSym"): options.files = "/store/data/Commissioni
 else: 
     print "stream ",options.streamName," not foreseen"
     exit
-options.maxEvents = 100000 # -1 means all events
+options.maxEvents = 1000000 # -1 means all events
 ### get and parse the command line arguments
 options.parseArguments()
 print options
