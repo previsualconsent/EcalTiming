@@ -107,28 +107,31 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//float energyThreshold = getEnergyThreshold(recHit.detid()) ; //changed
         std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()); // first->energy threshold, second->chi2 threshold
         //std::cout<<"Min Energy "<<energyThreshold.first<<" min chi2: "<<energyThreshold.second<<std::endl;
-	if( (recHit.energy() < (energyThreshold.first)) && (recHit.chi2()>energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
+	if( (recHit.energy() < (energyThreshold.first)) || (recHit.chi2()>energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
 
         _event_tracker+=1;
-        if(_event_tracker%10000==0) std::cout<<"------ event passed: "<<_event_tracker<<" ------"<<std::endl;
+        if(_event_tracker%10000==0) std::cout<<"------> event passed: "<<_event_tracker<<" <------"<<std::endl;
 
         //Adding occupancy part
-        if(recHit.detid().subdetId() == EcalBarrel){
-          EBDetId id(recHit.detid());
-          OccupancyEB[id.ieta()+85][id.iphi()]+=1;
-          dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
-        }else{
-          EEDetId id(recHit.detid());
-          int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
-          dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
-          if(id.zside()<0){
-            OccupancyEEM[id.ix()][id.iy()]+=1;
+        /*if(recHit.detid().subdetId()!= EcalBarrel && recHit.detid().subdetId()!= EcalEndcap) {
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<recHit.detid().subdetId() <<"\n";
+        }else{*/
+          if(recHit.detid().subdetId() == EcalBarrel){
+            EBDetId id(recHit.detid());
+            OccupancyEB[id.ieta()+85][id.iphi()]+=1;
+            dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
           }else{
-            OccupancyEEP[id.ix()][id.iy()]+=1;
-          }
-        }//end if for Barrel-EndCap
-
+            EEDetId id(recHit.detid());
+            int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
+            dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
+            if(id.zside()<0){
+              OccupancyEEM[id.ix()][id.iy()]+=1;
+            }else{
+              OccupancyEEP[id.ix()][id.iy()]+=1;
+            }
+          }//end if for Barrel-EndCap
+       // }
         //dumpAllToTree(infoTree, 0,0,0,0,0,0,0);
 
 	// add the EcalTimingEvent to the EcalCreateTimeCalibrations
@@ -144,6 +147,9 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
  */
 void EcalTimingCalibProducer::plotRecHit(const EcalTimingEvent& recHit)
 {
+      /*if(recHit.detid().subdetId() != EcalBarrel && recHit.detid().subdetId() != EcalEndcap){
+        throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<recHit.detid().subdetId()<<"\n";
+      }else{*/
 	if(recHit.detid().subdetId() == EcalBarrel) {
 		EBDetId id(recHit.detid());
 		// Fill Rechit Energy
@@ -164,6 +170,7 @@ void EcalTimingCalibProducer::plotRecHit(const EcalTimingEvent& recHit)
 			RechitEnergyTimeEEP->Fill(recHit.energy(), recHit.time());
 		}
 	}
+      //}
 }
 
 /**
@@ -175,6 +182,11 @@ void EcalTimingCalibProducer::plotRecHit(const EcalTimingEvent& recHit)
 EcalTimingEvent EcalTimingCalibProducer::correctGlobalOffset(const EcalTimingEvent& te, int splashDir, float bunchCorr)
 {
 	DetId id = te.detid();
+
+       /* if(id.subdetId() != EcalBarrel && id.subdetId() != EcalEndcap){
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<id.subdetId() <<"\n";
+          return EcalTimingEvent (EcalRecHit(id, -999, -999));
+        }*/
 
 	const CaloSubdetectorGeometry *geom = (id.subdetId() == EcalBarrel) ? barrelGeometry_ : endcapGeometry_;
 
@@ -197,8 +209,15 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	edm::ESHandle<CaloGeometry> pG;
 	iSetup.get<CaloGeometryRecord>().get(pG);
 	EcalRingCalibrationTools::setCaloGeometry(&(*pG));
-	endcapGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalEndcap);
-	barrelGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
+//        if(pG->getSubdetectorGeometry(DetId::Ecal, EcalEndcap) || pG->getSubdetectorGeometry(DetId::Ecal, EcalBarrel)){
+
+	  endcapGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalEndcap);
+	  barrelGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
+  /*      }else{
+          std::cout<<"problem"<<std::endl;
+          throw cms::Exception("EcalProblem") << "No valid subdetId() \n";
+          return false;
+        }*/
 
 	edm::ESHandle<EcalElectronicsMapping> hElecMap;
 	iSetup.get<EcalMappingRcd>().get(hElecMap);
@@ -225,6 +244,7 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	// recHit_itr is of type: edm::Handle<EcalRecHitCollection>::const_iterator
 	for(auto  recHit_itr = ebRecHitHandle->begin(); recHit_itr != ebRecHitHandle->end(); ++recHit_itr) {
 		// add the recHit to the list of recHits used for calibration (with the relative information)
+                
 		if(addRecHit(*recHit_itr, _eventTimeMap)) {
 			//EBDetId id(recHit.detid());
 			// if(id.ieta() == -75 && id.iphi() == 119) {
@@ -359,26 +379,30 @@ void EcalTimingCalibProducer::endJob()
 
 		int iRing = _ringTools.getRingIndexInSubdet(calibRecHit_itr->first);
 
-		if(calibRecHit_itr->first.subdetId() == EcalBarrel && iRing == EBRING) ds |= DS_RING;
-		else if(calibRecHit_itr->first.subdetId() == EcalEndcap && (iRing == EEmRING || iRing == EEpRING )) ds |= DS_RING;
+                //Adding exception problem
+               /* if(calibRecHit_itr->first.subdetId() != EcalBarrel && calibRecHit_itr->first.subdetId() != EcalEndcap){
+                  throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<calibRecHit_itr->first.subdetId() <<"\n";
+                }else{*/
+	  	  if(calibRecHit_itr->first.subdetId() == EcalBarrel && iRing == EBRING) ds |= DS_RING;
+	  	  else if(calibRecHit_itr->first.subdetId() == EcalEndcap && (iRing == EEmRING || iRing == EEpRING )) ds |= DS_RING;
 
-		if(ds != DS_NONE)
-		{
-			int ix, iy, iz;
-			if(calibRecHit_itr->first.subdetId() == EcalBarrel) {
-				EBDetId id(calibRecHit_itr->first);
-				ix = id.ieta();
-				iy = id.iphi();
-				iz = 0;
-			} else {
-				EEDetId id(calibRecHit_itr->first);
-				ix = id.ix();
-				iy = id.iy();
-				iz = id.zside();
-			}
-			calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing);
-		}
-
+	  	  if(ds != DS_NONE)
+	  	  {
+	  	  	int ix, iy, iz;
+	  	  	if(calibRecHit_itr->first.subdetId() == EcalBarrel) {
+	  	  		EBDetId id(calibRecHit_itr->first);
+	  	  		ix = id.ieta();
+	  	  		iy = id.iphi();
+	  	  		iz = 0;
+	  	  	} else {
+	  	  		EEDetId id(calibRecHit_itr->first);
+	  	  		ix = id.ix();
+	  	  		iy = id.iy();
+	  	  		iz = id.zside();
+	  	  	}
+	  	  	calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing);
+	  	  }
+                //}
 		// add filing Energy hists here
 	}
 
@@ -407,17 +431,21 @@ void EcalTimingCalibProducer::dumpCorrections(std::string filename)
 	// to make more efficient
 	for(auto calibRecHit_itr = _timeCalibMap.begin(); calibRecHit_itr != _timeCalibMap.end(); ++calibRecHit_itr) {
 		DetId id_ = calibRecHit_itr->first;
-		if(id_.subdetId() == EcalBarrel) {
-			EBDetId id(id_);
-			fout << id.ieta() << "\t" << id.iphi() << "\t" << 0
-			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
-			     << "\t" << id.rawId() << std::endl;
-		} else {
-			EEDetId id(id_);
-			fout << id.ix() << "\t" << id.iy() << "\t" << id.zside()
-			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
-			     << "\t" << id.rawId() << std::endl;
-		}
+                /*if(id_.subdetId() != EcalBarrel && id_.subdetId()!= EcalEndcap){
+                  throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<id_.subdetId() <<"\n";
+                }else{*/
+		  if(id_.subdetId() == EcalBarrel) {
+		  	EBDetId id(id_);
+		  	fout << id.ieta() << "\t" << id.iphi() << "\t" << 0
+		  	     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
+		  	     << "\t" << id.rawId() << std::endl;
+		  } else {
+		  	EEDetId id(id_);
+		  	fout << id.ix() << "\t" << id.iy() << "\t" << id.zside()
+		  	     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
+		  	     << "\t" << id.rawId() << std::endl;
+		  }
+               // }
 	}
 	fout.close();
 }
@@ -430,13 +458,17 @@ void EcalTimingCalibProducer::dumpCalibration(std::string filename)
 	// to make more efficient
 #ifdef DEBUG
 	DetId findId(RAWIDCRY);
-	if(findId.subdetId() == EcalBarrel) {
-		EBDetId id(RAWIDCRY);
-		fout << "EB: " << id.ieta() << "\t" << id.iphi() << "\t" << id.zside() << "\t" << _timeCalibConstants.barrelItems()[id.denseIndex()] << "\t" << *_timeCalibConstants.find(RAWIDCRY) << "\t" << id.rawId() << std::endl;
-	} else {
-		EEDetId id(findId);
-		fout << "EE: " << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[id.denseIndex()] << "\t" << *_timeCalibConstants.find(RAWIDCRY) << std::endl;
-	}
+        /*if (findId.subdetId() != EcalBarrel && findId.subdetId() != EcalEndcap){
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<findId.subdetId() <<"\n";
+        }else{*/
+	  if(findId.subdetId() == EcalBarrel) {
+	  	EBDetId id(RAWIDCRY);
+	  	fout << "EB: " << id.ieta() << "\t" << id.iphi() << "\t" << id.zside() << "\t" << _timeCalibConstants.barrelItems()[id.denseIndex()] << "\t" << *_timeCalibConstants.find(RAWIDCRY) << "\t" << id.rawId() << std::endl;
+	  } else {
+	  	EEDetId id(findId);
+	  	fout << "EE: " << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[id.denseIndex()] << "\t" << *_timeCalibConstants.find(RAWIDCRY) << std::endl;
+	  }
+        //}
 #endif
 
 	for(unsigned int i = 0; i < _timeCalibConstants.barrelItems().size(); ++i) {
@@ -460,53 +492,56 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 {
 	int ix,iy,iz;
 	int rawid = cal_itr->first.rawId();
-	if(cal_itr->first.subdetId() == EcalBarrel) {
-		EBDetId id(cal_itr->first);
-		// Fill Rechit Energy
-		EneMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.meanE()); // 2D energy map
-		TimeMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanWithinNSigma(2,10)); // 2D time map
-		TimeErrorMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+        /*if(cal_itr->first.subdetId() != EcalBarrel && cal_itr->first.subdetId() != EcalEndcap){
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<cal_itr->first.subdetId() <<"\n";
+        }else{*/
+	  if(cal_itr->first.subdetId() == EcalBarrel) {
+	  	EBDetId id(cal_itr->first);
+	  	// Fill Rechit Energy
+	  	EneMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.meanE()); // 2D energy map
+	  	TimeMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanWithinNSigma(2,10)); // 2D time map
+	  	TimeErrorMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
 
-		RechitEneEB_->Fill(cal_itr->second.meanE());   // 1D histogram
-		RechitTimeEB_->Fill(cal_itr->second.getMeanWithinNSigma(2,10)); // 1D histogram
+	  	RechitEneEB_->Fill(cal_itr->second.meanE());   // 1D histogram
+	  	RechitTimeEB_->Fill(cal_itr->second.getMeanWithinNSigma(2,10)); // 1D histogram
 
-                // Fill Occupancy histo
-                OccupancyEB_->Fill(id.ieta(),id.iphi(), OccupancyEB[id.ieta()+85][id.iphi()]);
+                  // Fill Occupancy histo
+                  OccupancyEB_->Fill(id.ieta(),id.iphi(), OccupancyEB[id.ieta()+85][id.iphi()]);
 
-		ix = id.ieta();
-		iy = id.iphi();
-		iz = 0;
+	  	ix = id.ieta();
+	  	iy = id.iphi();
+	  	iz = 0;
 
-	} else {
-		// create EEDetId
-		EEDetId id(cal_itr->first);
-		if(id.zside() < 0) {
-			EneMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
-			TimeMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
-			TimeErrorMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+	  } else {
+	  	// create EEDetId
+	  	EEDetId id(cal_itr->first);
+	  	if(id.zside() < 0) {
+	  		EneMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
+	  		TimeMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
+	  		TimeErrorMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
 
-			RechitEneEEM_->Fill(cal_itr->second.meanE());
-			RechitTimeEEM_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+	  		RechitEneEEM_->Fill(cal_itr->second.meanE());
+	  		RechitTimeEEM_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
 
-                        OccupancyEEM_->Fill(id.ix(), id.iy(), OccupancyEEM[id.ix()][id.iy()]);
+                          OccupancyEEM_->Fill(id.ix(), id.iy(), OccupancyEEM[id.ix()][id.iy()]);
 
-		} else {
-			EneMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
-			TimeMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
-			TimeErrorMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+	  	} else {
+	  		EneMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
+	  		TimeMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
+	  		TimeErrorMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
 
-			RechitEneEEP_->Fill(cal_itr->second.meanE());
-			RechitTimeEEP_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+	  		RechitEneEEP_->Fill(cal_itr->second.meanE());
+	  		RechitTimeEEP_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
 
-                        OccupancyEEP_->Fill(id.ix(), id.iy(), OccupancyEEP[id.ix()][id.iy()]);
+                          OccupancyEEP_->Fill(id.ix(), id.iy(), OccupancyEEP[id.ix()][id.iy()]);
 
-		}
+	  	}
 
-		ix = id.ix();
-		iy = id.iy();
-		iz = id.zside();
-	}
-
+	  	ix = id.ix();
+	  	iy = id.iy();
+	  	iz = id.zside();
+	  }
+       // }
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 	cal_itr->second.dumpCalibToTree(timingTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing);
 }
@@ -515,19 +550,24 @@ void EcalTimingCalibProducer::FillHWCorrectionHists(EcalTimeCalibrationMap::cons
 {
 	unsigned int elecID = getElecID(cal_itr->first);
 	float time = _HWCalibrationMap[elecID].mean();
-	if(cal_itr->first.subdetId() == EcalBarrel) {
-		EBDetId id(cal_itr->first);
-		// Fill Rechit Energy
-		HWTimeMapEB_->Fill(id.ieta(), id.iphi(), time); // 2D time map
-	} else {
-		// create EEDetId
-		EEDetId id(cal_itr->first);
-		if(id.zside() < 0) {
-			HWTimeMapEEM_->Fill(id.ix(), id.iy(), time);
-		} else {
-			HWTimeMapEEP_->Fill(id.ix(), id.iy(), time);
-		}
-	}
+        /*if(cal_itr->first.subdetId() != EcalBarrel && cal_itr->first.subdetId() != EcalEndcap){
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<cal_itr->first.subdetId() <<"\n";
+        }else{*/
+
+	  if(cal_itr->first.subdetId() == EcalBarrel) {
+	  	EBDetId id(cal_itr->first);
+	  	// Fill Rechit Energy
+	  	HWTimeMapEB_->Fill(id.ieta(), id.iphi(), time); // 2D time map
+	  } else {
+	  	// create EEDetId
+	  	EEDetId id(cal_itr->first);
+	  	if(id.zside() < 0) {
+	  		HWTimeMapEEM_->Fill(id.ix(), id.iy(), time);
+	  	} else {
+	  		HWTimeMapEEP_->Fill(id.ix(), id.iy(), time);
+	  	}
+	  }
+       // }
 
 }
 void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::const_iterator cal_itr, std::vector< std::pair<float, EcalCrystalTimingCalibration*> > energyStability)
@@ -536,18 +576,21 @@ void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::c
 	int ix,iy,iz;
   	int rawid = cal_itr->first.rawId();
 	//choose which map to store in
-	if(cal_itr->first.subdetId() == EcalBarrel) {
-		EBDetId id(cal_itr->first);
-		ix = id.ieta();
-		iy = id.iphi();
-		iz = 0;
-	} else {
-		EEDetId id(cal_itr->first);
-		ix = id.ix();
-		iy = id.iy();
-		iz = id.zside();
-	}
-
+       /* if(cal_itr->first.subdetId() != EcalBarrel && cal_itr->first.subdetId() != EcalEndcap){
+          throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<cal_itr->first.subdetId() <<"\n";
+        }else{*/
+	  if(cal_itr->first.subdetId() == EcalBarrel) {
+	  	EBDetId id(cal_itr->first);
+	  	ix = id.ieta();
+	  	iy = id.iphi();
+	  	iz = 0;
+	  } else {
+	  	EEDetId id(cal_itr->first);
+	  	ix = id.ix();
+	  	iy = id.iy();
+	  	iz = id.zside();
+	  }
+       // }
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 
 	// Add min_energy to the tree which gets filld inside the dump function

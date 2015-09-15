@@ -31,6 +31,10 @@
 #include "DataFormats/CaloRecHit/interface/CaloID.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
 
+#include "CondFormats/EcalObjects/interface/EcalSampleMask.h"
+
+#include "EcalTiming/EcalTiming/plugins/EcalTimingCalibProducer.h"
+
 //
 // class declaration
 //
@@ -86,7 +90,6 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   //std::cout << "\n-----------New Event ----------------\n " << std::endl;
   using namespace edm;   
   // build an empty collection
-
   // fake rechits
   // handle to try to fill
   edm::Handle<EcalRecHitCollection> barrelRecHitsHandle;
@@ -126,15 +129,18 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
   std::auto_ptr<EEDigiCollection> fakeEEDigiCollection( new EEDigiCollection) ;
   *fakeEEDigiCollection = eefakecol;
 
-
   if(!doDigi_) { 
     bool foundEBRechit = true;
     bool foundEERechit = true;
+    std::cout<<"sono entrato nel !dodigi"<<std::endl;
 
     // if you dont find the barrel rechits youre looking for, put in a fake one
     try { 
       iEvent.getByLabel(tag_barrelHitProducer_, barrelRecHitsHandle);
-      *rechits_eb = *(barrelRecHitsHandle.product());       
+      *rechits_eb = *(barrelRecHitsHandle.product());    
+      for (auto recHit_itr = barrelRecHitsHandle->begin(); recHit_itr != barrelRecHitsHandle->end(); ++recHit_itr){
+          std::cout<<"sono entrato nell'if eb"<<std::endl;
+      }
     }
     catch(cms::Exception& ex) { foundEBRechit = rechits_eb->size() > 0;}     
     // if you found the collection put it back into the event
@@ -142,6 +148,7 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
      
     // if you dont find the endcap rechits youre looking for, put in a fake one
     try {
+      //std::cout<<"sono entrato nell'if ee dodigi"<<std::endl;
       iEvent.getByLabel(tag_endcapHitProducer_, endcapRecHitsHandle);
       *rechits_ee = *(endcapRecHitsHandle.product());
     } 
@@ -149,30 +156,60 @@ void DummyRechitDigis::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     } 
 
     iEvent.put( foundEERechit ? rechits_ee : rechits_temp2, endcapRecHitCollection_);
+    std::cout<<"Build fake digi!"<<std::endl;
   } // end dummy rechits
-   
   // Build fake digi collections
   else {    
     bool foundEBDigi = true;
     bool foundEEDigi = true;
 
+    //std::cout<<"sono nell'else di dummyrecHit"<<std::endl;
+
     try { // barrel digis
       iEvent.getByLabel(tag_barrelDigiProducer_, digisEBHandle);
+      for(EBDigiCollection::const_iterator digiItr = digisEBHandle->begin(); digiItr != digisEBHandle->end(); ++digiItr){
+          //EBDetId id_crystal(digiItr->id());
+          DetId id = digiItr->id();
+          //std::cout<<id.subdetId()<<std::endl;
+          //std::cout<<"SUBDETID!! Barrel "<<digiItr->id()<<std::endl;
+          if(id.subdetId()!=EcalBarrel){
+               std::cout<<"SUBDETID: "<<id.subdetId()<<std::endl;
+               throw cms::Exception("EcalProblem") << "No valid subdetId() \n";
+          }
+
+      }
+
       *outputEBDigiCollection = *(digisEBHandle.product());
+      //std::cout<<"sono entrato nell'else eb"<<std::endl;
     }
     catch (cms::Exception& ex) {
       foundEBDigi = outputEBDigiCollection->size() > 0;
+      //std::cout<<"sono entrato nel catch eb"<<std::endl;
     }     
 
     // insert the EB collection
     iEvent.put(foundEBDigi ? outputEBDigiCollection : fakeEBDigiCollection, barrelDigiCollection_);
 
     try { // endcap digis
-      iEvent.getByLabel(tag_endcapDigiProducer_, digisEEHandle);
-      *outputEEDigiCollection = *(digisEEHandle.product());
+     iEvent.getByLabel(tag_endcapDigiProducer_, digisEEHandle);
+     for(EEDigiCollection::const_iterator digiItr = digisEEHandle->begin(); digiItr != digisEEHandle->end(); ++digiItr){
+              DetId id = digiItr->id();
+             // std::cout<<id.subdetId()<<std::endl;
+             // std::cout<<"SUBDETID: "<<id.subdetId()<<std::endl;
+              if(id.subdetId()!=EcalEndcap){
+                 std::cout<<"SUBDETID: "<<id.subdetId()<<std::endl;
+                 throw cms::Exception("EcalProblem") << "No valid subdetId() \n"; 
+              }
+             // EEDetId id_crystal(digiItr->id());
+             // std::cout<<"SUBDETID!! Endcap "<<digiItr->id()<<std::endl;
+     //             throw cms::Exception("EcalProblem") << "No valid subdetId(): "<<digiItr->id().subdetId() <<"\n"; 
+     }
+     *outputEEDigiCollection = *(digisEEHandle.product());
+      //std::cout<<"sono entrato nell'else ee"<<std::endl;
     }
     catch (cms::Exception& ex) {
       foundEEDigi = outputEEDigiCollection->size() > 0;
+      //std::cout<<"sono entrato nel catch ee"<<std::endl;
     }
     //     std::cout << "Putting Real EE collection?  " << foundEEDigi <<  std::endl;
     iEvent.put(foundEEDigi ? outputEEDigiCollection : fakeEEDigiCollection, endcapDigiCollection_);

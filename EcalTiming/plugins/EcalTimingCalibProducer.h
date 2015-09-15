@@ -48,6 +48,8 @@
 #include <iostream>
 #include <fstream>
 
+// Inserting Exception part
+#include "FWCore/Utilities/interface/Exception.h"
 // Make Histograms the way!!
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"

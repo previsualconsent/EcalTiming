@@ -76,7 +76,7 @@ elif(options.streamName=="AlCaPhiSym"): options.files = "/store/data/Commissioni
 else: 
     print "stream ",options.streamName," not foreseen"
     exit
-options.maxEvents = 1000000 # -1 means all events
+options.maxEvents = -1 # -1 means all events
 ### get and parse the command line arguments
 options.parseArguments()
 print options
@@ -93,9 +93,9 @@ processname = options.step
 doReco = True
 doAnalysis = True
 if "RECO" not in processname:
-	doReco = False
+    doReco = False
 if "TIME" not in processname:
-	doAnalysis = False
+    doAnalysis = False
 
 process = cms.Process(processname)
 
@@ -127,6 +127,7 @@ else:
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load('EcalTiming.EcalTiming.ecalLocalRecoSequenceAlCaStream_cff')
+process.load('EcalTiming.EcalTiming.ecalLocalRecoSequenceAlCaP0Stream_cff')
 
 if(options.streamName=="AlCaP0"):
     process.ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag("hltAlCaPi0EBRechitsToDigis","pi0EBDigis")
@@ -159,9 +160,6 @@ process.digiStep = cms.Sequence(process.ecalDigis  + process.ecalPreshowerDigis)
 
 
 
-
-
-
 ### Print Out Some Messages
 #process.MessageLogger = cms.Service("MessageLogger",
 #    cout = cms.untracked.PSet(
@@ -177,6 +175,8 @@ process.options = cms.untracked.PSet(
 #    SkipEvent = cms.untracked.vstring('ProductNotFound')
 )
 
+SkipEvent = cms.untracked.vstring('ProductNotFound','EcalProblem')
+
 # dbs search --query "find file where dataset=/ExpressPhysics/BeamCommissioning09-Express-v2/FEVT and run=124020" | grep store | awk '{printf "\"%s\",\n", $1}'
 # Input source
 print "source files:",options.files
@@ -187,8 +187,8 @@ process.source = cms.Source("PoolSource",
 )
 
 if(len(options.jsonFile) > 0):
-	import FWCore.PythonUtilities.LumiList as LumiList
-	process.source.lumisToProcess = LumiList.LumiList(filename = options.jsonFile).getVLuminosityBlockRange()
+    import FWCore.PythonUtilities.LumiList as LumiList
+    process.source.lumisToProcess = LumiList.LumiList(filename = options.jsonFile).getVLuminosityBlockRange()
 
 
 
@@ -218,18 +218,18 @@ if doAnalysis:
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(options.maxEvents))
 
 #DUMMY RECHIT
-process.dummyHits = cms.EDProducer('DummyRechitDigis',
+process.dummyHits = cms.EDProducer("DummyRechitDigis",
                                     doDigi = cms.untracked.bool(True),
                                     # rechits
-                                    barrelHitProducer      = cms.InputTag('hltAlCaPi0EBUncalibrator','pi0EcalRecHitsEB' ,'HLT'),
-                                    endcapHitProducer      = cms.InputTag('hltAlCaPi0EEUncalibrator','pi0EcalRecHitsEE' ,'HLT'),
-                                    barrelRecHitCollection = cms.untracked.string('dummyBarrelRechits'),
-                                    endcapRecHitCollection = cms.untracked.string('dummyEndcapRechits'),
+                                    barrelHitProducer      = cms.InputTag('hltAlCaPi0EBUncalibrator','pi0EcalRecHitsEB' ,"HLT"),
+                                    endcapHitProducer      = cms.InputTag('hltAlCaPi0EEUncalibrator','pi0EcalRecHitsEE' ,"HLT"),
+                                    barrelRecHitCollection = cms.untracked.string("dummyBarrelRechitsPi0"),
+                                    endcapRecHitCollection = cms.untracked.string("dummyEndcapRechitsPi0"),
                                     # digis
-                                    barrelDigis            = cms.InputTag("hltAlCaPi0EBRechitsToDigis","pi0EBDigis","HLT"),
-                                    endcapDigis            = cms.InputTag("hltAlCaPi0EERechitsToDigis","pi0EEDigis","HLT"),
-                                    barrelDigiCollection   = cms.untracked.string('dummyBarrelDigis'),
-                                    endcapDigiCollection   = cms.untracked.string('dummyEndcapDigis'))
+                                    barrelDigis            = cms.InputTag('hltAlCaPi0EBRechitsToDigis','pi0EBDigis',"HLT"),
+                                    endcapDigis            = cms.InputTag('hltAlCaPi0EERechitsToDigisLowPU','pi0EEDigis',"HLT"), #changed hltAlCaPi0EERechitsToDigis in LowPU....changed in the file -.-
+                                    barrelDigiCollection   = cms.untracked.string("dummyBarrelDigisPi0"),
+                                    endcapDigiCollection   = cms.untracked.string("dummyEndcapDigisPi0"))
 
 process.filter=cms.Sequence()
 if(options.isSplash==1):
@@ -237,16 +237,34 @@ if(options.isSplash==1):
     process.reco_step = cms.Sequence(process.caloCosmicOrSplashRECOSequence)
 else:
     if(options.streamName=="AlCaP0"):
-      from RecoLocalCalo.Configuration.ecalLocalRecoSequence_cff import *
-      #process.reco_step = cms.Sequence(ecalMultiFitUncalibRecHit *
-      #                                    ecalRecHit)
-      ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag('dummyHits','dummyBarrelDigis')#,'piZeroAnalysis')
-      ecalMultiFitUncalibRecHit.EEdigiCollection = cms.InputTag('dummyHits','dummyEndcapDigis')#,'piZeroAnalysis')
-      ecalRecHit.killDeadChannels = False
-      ecalRecHit.recoverEBFE = False
+      #from RecoLocalCalo.Configuration.ecalLocalRecoSequence_cff import *
+      ##process.reco_step = cms.Sequence(ecalMultiFitUncalibRecHit *
+      ##                                    ecalRecHit)
+      #process.ecalMultiFitUncalibRecHit = RecoLocalCalo.EcalRecProducers.ecalMultiFitUncalibRecHit_cfi.ecalMultiFitUncalibRecHit.clone()
+
+      #process.ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag('dummyHits','dummyBarrelDigis')#,'piZeroAnalysis')
+      #process.ecalMultiFitUncalibRecHit.EEdigiCollection = cms.InputTag('dummyHits','dummyEndcapDigis')#,'piZeroAnalysis')
+      #ecalRecHit.killDeadChannels = False
+      #ecalRecHit.recoverEBFE = False
+      import RecoLocalCalo.EcalRecProducers.ecalMultiFitUncalibRecHit_cfi
+      process.ecalMultiFitUncalibRecHit =  RecoLocalCalo.EcalRecProducers.ecalMultiFitUncalibRecHit_cfi.ecalMultiFitUncalibRecHit.clone()
+      process.ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag('dummyHits','dummyBarrelDigisPi0')#,'piZeroAnalysis')
+      process.ecalMultiFitUncalibRecHit.EEdigiCollection = cms.InputTag('dummyHits','dummyEndcapDigisPi0')#,'piZeroAnalysis')
+
+      #UNCALIB to CALIB
+      from RecoLocalCalo.EcalRecProducers.ecalRecHit_cfi import *
+      process.ecalDetIdToBeRecovered =  RecoLocalCalo.EcalRecProducers.ecalDetIdToBeRecovered_cfi.ecalDetIdToBeRecovered.clone()
+      process.ecalRecHit.killDeadChannels = cms.bool( False )
+      process.ecalRecHit.recoverEBVFE = cms.bool( False )
+      process.ecalRecHit.recoverEEVFE = cms.bool( False )
+      process.ecalRecHit.recoverEBFE = cms.bool( False )
+      process.ecalRecHit.recoverEEFE = cms.bool( False )
+      process.ecalRecHit.recoverEEIsolatedChannels = cms.bool( False )
+      process.ecalRecHit.recoverEBIsolatedChannels = cms.bool( False )
+
       process.reco_step = cms.Sequence(process.dummyHits
-                                      + process.ecalMultiFitUncalibRecHit
-                                      + process.ecalRecHit)
+                                      * process.ecalMultiFitUncalibRecHit
+                                      * process.ecalRecHit)
     else:
       #process.reco_step = cms.Sequence(process.reconstruction_step_multiFit)
       process.reco_step = cms.Sequence(process.ecalLocalRecoSequenceAlCaStream)
@@ -296,11 +314,11 @@ if doReco:
 
 process.seq = cms.Sequence()
 if doReco:
-	process.seq += process.reco
+    process.seq += process.reco
 if doAnalysis:
-	process.seq += process.analysis
+    process.seq += process.analysis
 else:
-	process.endp = cms.EndPath(process.RECOoutput)
+    process.endp = cms.EndPath(process.RECOoutput)
 
 process.p = cms.Path(process.seq)
 
