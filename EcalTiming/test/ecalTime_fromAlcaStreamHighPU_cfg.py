@@ -56,6 +56,12 @@ options.register('streamName',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "type of stream: AlCaPhiSym or AlCaP0")
+options.register('loneBunch',
+                   1,
+                   VarParsing.VarParsing.multiplicity.singleton,
+                   VarParsing.VarParsing.varType.int,
+                   "0=No, 1=Yes"
+                 )
 
 #options.jsonFile="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/Cert_246908-256869_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
 #options.jsonFile="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/DCSOnly/json_DCSONLY.txt"                 
@@ -241,7 +247,8 @@ else:
       #process.ecalMultiFitUncalibRecHit.EEdigiCollection = cms.InputTag('dummyHits','dummyEndcapDigis')#,'piZeroAnalysis')
       #ecalRecHit.killDeadChannels = False
       #ecalRecHit.recoverEBFE = False
-      process.filter+=process.triggerSelectionLoneBunch
+      if(options.loneBunch==1):
+        process.filter+=process.triggerSelectionLoneBunch
       import RecoLocalCalo.EcalRecProducers.ecalMultiFitUncalibRecHit_cfi
       process.ecalMultiFitUncalibRecHit =  RecoLocalCalo.EcalRecProducers.ecalMultiFitUncalibRecHit_cfi.ecalMultiFitUncalibRecHit.clone()
       process.ecalMultiFitUncalibRecHit.EBdigiCollection = cms.InputTag('dummyHits','dummyBarrelDigisPi0')#,'piZeroAnalysis')
@@ -263,7 +270,8 @@ else:
                                       * process.ecalRecHit)
     else:
       #process.reco_step = cms.Sequence(process.reconstruction_step_multiFit)
-      process.filter+=process.triggerSelectionLoneBunch
+      if(options.loneBunch==1):
+        process.filter+=process.triggerSelectionLoneBunch
       process.reco_step = cms.Sequence(process.ecalLocalRecoSequenceAlCaStream)
       
 
