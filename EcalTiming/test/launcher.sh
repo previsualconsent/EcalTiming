@@ -6,7 +6,7 @@
 #   ./launcher.sh /store/data/Run2015B/AlCaP0/RAW/v1/000/ 251 562 "AlCaP0"   #
 ##############################################################################
 
-cd /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/
+cd /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/
 export SCRAM_ARCH='slc6_amd64_gcc491'
 eval `scramv1 runtime -sh`
 source /afs/cern.ch/project/eos/installation/cms/etc/setup.sh 
@@ -26,7 +26,7 @@ EOSCMD="/afs/cern.ch/project/eos/installation/cms/bin/eos.select"
 #do
 #  echo "Input " $line
 #
-#done</afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/test.txt
+#done</afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/test.txt
 
 echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 
@@ -98,10 +98,10 @@ cd $CMSSW_BASE/src/EcalTiming/EcalTiming/test/
 
 
 if [ -z "$3" ]; then
-  cmsRun /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/EcalTiming/EcalTiming/test/ecalTime_fromAlcaStreamHighPU_cfg.py files="$fileList" output="/afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/EcalTiming/EcalTiming/test/output/run"${firstFolder}${secondFolder}"_"${2}"_test.root" streamName=$2
+  cmsRun /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/EcalTiming/EcalTiming/test/ecalTime_fromAlcaStreamHighPU_cfg.py files="$fileList" output="/afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/EcalTiming/EcalTiming/test/output/run"${firstFolder}${secondFolder}"_"${2}"_test_new.root" streamName=$2 jsonFile="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/DCSOnly/json_DCSONLY.txt"
 else
 
-  cmsRun /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/EcalTiming/EcalTiming/test/ecalTime_fromAlcaStreamHighPU_cfg.py files="$fileList" output="/afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_4_patch4/src/EcalTiming/EcalTiming/test/output/run"${2}${3}"_"${4}"_test.root" streamName=$4 
+  cmsRun /afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/EcalTiming/EcalTiming/test/ecalTime_fromAlcaStreamHighPU_cfg.py files="$fileList" output="/afs/cern.ch/work/s/sgelli/public/CMSSW_7_4_12_patch4/src/EcalTiming/EcalTiming/test/output/run"${2}${3}"_"${4}"_test_new.root" streamName=$4 jsonFile="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/DCSOnly/json_DCSONLY.txt" 
 
 fi
 

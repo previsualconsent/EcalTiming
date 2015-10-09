@@ -7,3 +7,4 @@ pippo*
 *.pyc
 html/*
 LSF*
+*.list

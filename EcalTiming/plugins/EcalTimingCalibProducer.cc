@@ -107,6 +107,16 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//float energyThreshold = getEnergyThreshold(recHit.detid()) ; //changed
         std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()); // first->energy threshold, second->chi2 threshold
         //std::cout<<"Min Energy "<<energyThreshold.first<<" min chi2: "<<energyThreshold.second<<std::endl;
+        if(recHit.detid().subdetId() == EcalBarrel){
+          EBDetId id(recHit.detid());
+          dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
+        }else{
+          EEDetId id(recHit.detid());
+          int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
+          dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
+        }
+
+
 	if( (recHit.energy() < (energyThreshold.first)) || (recHit.chi2()>energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
 	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
 
@@ -120,11 +130,11 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
           if(recHit.detid().subdetId() == EcalBarrel){
             EBDetId id(recHit.detid());
             OccupancyEB[id.ieta()+85][id.iphi()]+=1;
-            dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
+           // dumpAllToTree(infoTree, id.ieta(), id.iphi(), 0, recHit.time(), recHit.energy(), recHit.chi2(), 13 * 0.04  + _energyThresholdOffsetEB);
           }else{
             EEDetId id(recHit.detid());
-            int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
-            dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
+            //int iRing = _ringTools.getRingIndexInSubdet(recHit.detid());
+            //dumpAllToTree(infoTree, id.ix(), id.iy(), id.zside(), recHit.time(), recHit.energy(), recHit.chi2(), 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000 + _energyThresholdOffsetEE);
             if(id.zside()<0){
               OccupancyEEM[id.ix()][id.iy()]+=1;
             }else{
@@ -400,7 +410,7 @@ void EcalTimingCalibProducer::endJob()
 	  	  		iy = id.iy();
 	  	  		iz = id.zside();
 	  	  	}
-	  	  	calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing);
+	  	  	calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing); //changed
 	  	  }
                 //}
 		// add filing Energy hists here
@@ -543,7 +553,7 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 	  }
        // }
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
-	cal_itr->second.dumpCalibToTree(timingTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing);
+	cal_itr->second.dumpCalibToTree(timingTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing); 
 }
 
 void EcalTimingCalibProducer::FillHWCorrectionHists(EcalTimeCalibrationMap::const_iterator cal_itr)
@@ -605,7 +615,7 @@ void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::c
 	for(auto it = energyStability.begin(); it!=energyStability.end(); it++)
 	{
 		min_energy = it->first;
-		it->second->dumpCalibToTree(energyStabilityTree,rawid,ix,iy,iz,getElecID(cal_itr->first),iRing);
+		it->second->dumpCalibToTree(energyStabilityTree,rawid,ix,iy,iz,getElecID(cal_itr->first),iRing); 
 		index++;
 	}
 
