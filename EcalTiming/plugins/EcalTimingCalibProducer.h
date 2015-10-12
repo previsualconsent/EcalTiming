@@ -48,8 +48,6 @@
 #include <iostream>
 #include <fstream>
 
-// Inserting Exception part
-#include "FWCore/Utilities/interface/Exception.h"
 // Make Histograms the way!!
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
@@ -225,19 +223,15 @@ private:
 	{
 		return (elecMap_->getElectronicsId(id).rawId() >> 6) & 0x3FFF;
 	}
-	//float getEnergyThreshold(const DetId detid)
 	std::pair <float, float> getEnergyThreshold(const DetId detid)
 	{
 		int iRing = _ringTools.getRingIndexInSubdet(detid);
-		//std::pair <float, float> outputThr = detid.subdetId() == EcalBarrel ? {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB} : {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE}
 		std::pair <float, float> outputThr;
 		if (detid.subdetId() == EcalBarrel) {
 			outputThr = {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB};
 		} else {
 			outputThr = {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE};
 		}
-		//return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :
-		//	20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
 		return outputThr;
 	}
 

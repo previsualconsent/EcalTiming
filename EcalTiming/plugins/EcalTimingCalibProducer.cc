@@ -103,7 +103,6 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//check if rechit is valid
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
-	//float energyThreshold = getEnergyThreshold(recHit.detid()) ; //changed
 	std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()); // first->energy threshold, second->chi2 threshold
 	if( (recHit.energy() < (energyThreshold.first)) || (recHit.chi2() > energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
 
@@ -204,11 +203,6 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 		// add the recHit to the list of recHits used for calibration (with the relative information)
 
 		if(addRecHit(*recHit_itr, _eventTimeMap)) {
-			//EBDetId id(recHit.detid());
-			// if(id.ieta() == -75 && id.iphi() == 119) {
-			// 	std::cout << "RawID\t" << id.rawId() << std::endl;
-			// 	return false;
-			// }
 			timeEB.add(EcalTimingEvent(*recHit_itr), false);
 		}
 	}
@@ -300,7 +294,6 @@ void EcalTimingCalibProducer::endJob()
 		_timeCalibConstants.setValue(calibRecHit_itr->first.rawId(), correction);
 
 		unsigned int ds = DS_NONE;
-		//TODO: This probably shouldn't be commented out. Move the stat check into the individual functions?
 		if(calibRecHit_itr->second.num() > 50) {
 			// check the asymmetry of the distribution: if asymmetric, dump the full set of events for further offline studies
 			if(fabs(calibRecHit_itr->second.getSkewnessWithinNSigma(n_sigma, 10)) > _maxSkewnessForDump)  {
@@ -310,7 +303,6 @@ void EcalTimingCalibProducer::endJob()
 
 			// check if result is stable as function of energy
 			std::vector< std::pair<float, EcalCrystalTimingCalibration*> > energyStability;
-			//float energyThreshold = getEnergyThreshold(calibRecHit_itr->first); //changed
 			std::pair <float, float> energyThreshold = getEnergyThreshold(calibRecHit_itr->first);
 			if(! calibRecHit_itr->second.isStableInEnergy(energyThreshold.first, energyThreshold.first + _minRecHitEnergyStep * _minRecHitEnergyNStep, _minRecHitEnergyStep, energyStability)) {
 				ds |= DS_UNSTABLE_EN;
@@ -344,7 +336,7 @@ void EcalTimingCalibProducer::endJob()
 				iy = id.iy();
 				iz = id.zside();
 			}
-			calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing); //changed
+			calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing);
 		}
 		// add filing Energy hists here
 	}
@@ -358,12 +350,9 @@ void EcalTimingCalibProducer::endJob()
 
 	char filename[100];
 	sprintf(filename, "%s.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
-	std::cout << "Output Root File" << std::endl;
-	std::cout << _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str() << std::endl;
 	dumpCalibration(filename);
 	sprintf(filename, "%s-corr.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
 	dumpCorrections(filename);
-	// save the xml
 }
 
 void EcalTimingCalibProducer::dumpCorrections(std::string filename)
@@ -473,7 +462,6 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 		iy = id.iy();
 		iz = id.zside();
 	}
-	// }
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 	cal_itr->second.dumpCalibToTree(timingTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing);
 }
@@ -515,7 +503,6 @@ void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::c
 		iy = id.iy();
 		iz = id.zside();
 	}
-	// }
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 
 	// Add min_energy to the tree which gets filld inside the dump function
