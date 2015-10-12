@@ -16,7 +16,6 @@
 #define DS_RING         0x08
 #define DS_CRYS     		0x10
 
-
 class EcalCrystalTimingCalibration
 {
 public:

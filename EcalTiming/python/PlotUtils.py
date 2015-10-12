@@ -139,3 +139,15 @@ def drawMultipleSame(hists,labels,filename,colors=[], width = 500, height = 500,
 
     leg.Draw()
     canv.SaveAs(filename)
+
+def makePlotFolder(path):
+	import os
+	import errno
+	import shutil
+	try:
+		os.makedirs(path)
+	except OSError as exc: # Python >2.5
+		if exc.errno == errno.EEXIST and os.path.isdir(path):
+			pass
+		else: raise
+	shutil.copy("plots/index.php", path)

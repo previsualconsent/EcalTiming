@@ -1,15 +1,25 @@
-RUNLIST="243479 243484 243506"
-RUNLIST="248030"
-RUNLIST=`cat runlist`
-RUNLIST="251244 251251 251252 251521 251522 251548 251559 251560 251561 251562"
+#RUNLIST="251244 251251 251252 251521 251522 251548 251559 251560 251561 251562"
+#2015B
+#RUNLIST="251643 251721 251883"
+#RUNPERIOD=Run2015B-v1
+#2015C
+#RUNLIST="254231 254232 254790 254879" #254852 
+RUNPERIOD=Run2015C-v1
+
+#RUNLIST="254292 254293 254294 254319 254332 254341 254342 254349 254458 254459 254608"
+RUNLIST="254307 255981 256001 256002 256003 256167 256169 256171 256215 256237" #256245 256349 256350 256355 256406"
 
 STREAM=AlCaPhiSym
 NEVENTS=-1
 QUEUE=2nd
-DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/Validation_notCCUSubtracted/
-CONFIG=test/ecalTime_fromAlcaStream_cfg.py
+EOSPREFIX=root://eoscms//eos/cms/
+EOSDIR=/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/
+#DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/RunII/
+CONFIG=$PWD/test/ecalTime_fromAlcaStream_cfg.py
+NJOBS=1
+USER=$(whoami)
 
-FROMRECO=NO
+STEP=RECOTIMEANALYSIS
 for i in "$@"
 do
 case $i in
@@ -18,7 +28,7 @@ case $i in
     shift # past argument=value
     ;;
     -c=*|--cfg=*)
-    CONFIG="${i#*=}"
+    CONFIG=$PWD/"${i#*=}"
     shift # past argument=value
     ;;
     -d=*|--dir=*)
@@ -46,45 +56,80 @@ case $i in
     SPLIT=YES
     shift # past argument with no value
     ;;
-    --fromreco)
-    FROMRECO=YES
-    shift # past argument with no value
+    --step=*)
+    STEP="${i#*=}"
+    shift # past argument=value
+    ;;
+    --json=*)
+    JSON="${i#*=}"
+    shift # past argument=value
+    ;;
+    --runperiod=*)
+    RUNPERIOD="${i#*=}"
+    shift # past argument=value
+    ;;
+    --tag=*)
+    GLOBALTAG="${i#*=}"
+    shift # past argument=value
+    ;;
+    --njobs=*)
+    NJOBS="${i#*=}"
+    shift # past argument=value
     ;;
     *)
             # unknown option
 		echo option $i not defined
+		exit 1 
     ;;
 esac
 done
 
+if [[ -z $GLOBALTAG ]]
+then
+	echo Tag not set
+	exit 1
+fi
+
 for RUN in ${RUNLIST}
 do
-
-	echo "=== RUN = ${RUN}"
-	OUTDIR=$DIR/${STREAM}-${RUN}/
-	mkdir -p ${OUTDIR}
-
-	if [ "$FROMRECO" == "NO" ]
+	if ! grep $RUN $JSON > /dev/null;
 	then
-		STEP=RECOTIMEANALYSIS
-		filelist=`das_client.py --query="file dataset=/MinimumBias/Commissioning2015-v1/RAW run=${RUN}" --limit=50 | sed '2 d'`
-		nfiles=`das_client.py --query="file dataset=/${STREAM}/Run2015B-v1/RAW run=${RUN} | count(file.name)" | sed '2 d'`
+		echo $RUN not in JSON $JSON
+		continue
+	fi
+	echo "=== RUN = ${RUN}"
+	OUTDIR=$EOSDIR/${STREAM}-${RUN}/
+	/afs/cern.ch/project/eos/installation/0.3.84-aquamarine/bin/eos.select mkdir ${OUTDIR}
+	AFSDIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/analysis/${STREAM}-${RUN}/
+	mkdir -p ${AFSDIR}
+
+	if [[ $STEP == *"RECO"* ]]
+	then
+		RECO="_RECO"
+		nfiles=`das_client.py --query="file dataset=/${STREAM}/${RUNPERIOD}/RAW run=${RUN} | count(file.name)" | sed '2 d'`
 		nfiles=${nfiles:19}
 
 		if ! [[ $nfiles =~ ^[0-9]+$ ]]; then
 			echo "No Files found"
-		exit 1
+			continue
 		fi
 
 		#echo Will run over $nfiles files
-		filelist=`das_client.py --query="file dataset=/${STREAM}/Run2015B-v1/RAW run=${RUN}" --limit=${nfiles} | sed '2 d'`
+		filelist=`das_client.py --query="file dataset=/${STREAM}/${RUNPERIOD}/RAW run=${RUN}" --limit=${nfiles} | sed '2 d'`
 		# for file in ${filelist}
 		# do
 		# das_client.py --query="file=${file} | sum(file.nevents)"
 		# done
 	else
-		STEP=TIMEANALYSIS
-		filelist=`grep ${RUN}  ~shervin/public/4peter/fileMap-sorted.dat  | cut -d ' ' -f2`
+		#filelist=`grep ${RUN}  ~shervin/public/4peter/fileMap-sorted.dat  | cut -d ' ' -f2`
+		#filelist=(${OUTDIR}/ecalTiming_*_numEvent50000_RECO.root)
+		#filelist=${filelist[@]/#/file://}
+		filelist=${OUTDIR}
+
+	fi
+	if [[ $STEP == *"TIME"* ]]
+	then
+		RECO=""
 	fi
 
 	if [ "$SPLIT" != "YES" ]
@@ -93,22 +138,42 @@ do
 		filelist=`echo ${filelist}| sed 's| |,|g;s|,$||'`
 	fi
 	
-	jsonFile=/afs/cern.ch/cms/CAF/CMSALCA/ALCA_ECALCALIB/json_ecalonly/251022-251562-Prompt-pfgEcal-noLaserProblem.json
+	#jsonFile=/afs/cern.ch/cms/CAF/CMSALCA/ALCA_ECALCALIB/json_ecalonly/251022-251562-Prompt-pfgEcal-noLaserProblem.json
 
 	i=0
 	for file in $filelist
 	do
-		name=${i}_${en}GeV
-		runcommand="cmsRun ${CONFIG} files=${filelist} output=${OUTDIR}/ecalTiming_${name}.root maxEvents=${NEVENTS} jsonFile=${jsonFile} minEnergyEB=1.5 minEnergyEE=2.5 step=${STEP}"
+	for job in `seq $NJOBS`
+	do
+		name=${i}
+		let n=$NEVENTS/$NJOBS
+		let skip=$n*$i
+		tmp_file=ecalTiming_${name}.root
+		if [ "$n" == "-1" ]
+		then
+			tmp_file_real=ecalTiming_${name}${RECO}.root
+		else
+			tmp_file_real=ecalTiming_${name}_numEvent${n}${RECO}.root
+		fi
+		runcommand="cmsRun ${CONFIG} files=${filelist} output=${tmp_file} maxEvents=${n} jsonFile=${JSON} minEnergyEB=1.5 minEnergyEE=2.5 step=${STEP} skipEvents=${skip} globaltag=${GLOBALTAG};"
+		#runcommand+="ls -l;"
+		#runcommand+="df -h;"
+		runcommand+="xrdcp ${tmp_file_real} ${EOSPREFIX}${OUTDIR}/;"
+		if [[ $STEP == *"TIME"* ]]
+		then
+			runcommand+="cp ecalTiming_* ${AFSDIR}/;"
+		fi
 		if [ "$BATCH" == "YES" ]
 		then
-			bsub -oo ${OUTDIR}/stdout-${name}-${NEVENTS}.log -eo ${OUTDIR}/stderr-${name}-${NEVENTS}.log -R "rusage[mem=4000]" -q ${QUEUE} "cd $PWD; eval \`scramv1 runtime -sh\`; 
+			bsub -oo log/stdout-${STREAM}-${RUN}-${name}-${NEVENTS}.log -eo log/stderr-${STREAM}-${RUN}-${name}-${NEVENTS}.log -R "rusage[mem=4000]" -q ${QUEUE} "cd $PWD; eval \`scramv1 runtime -sh\`; cd -
 			${runcommand}
 			" || exit 1
 		else
-			$runcommand
+			echo $runcommand
+			eval $runcommand
 		fi
 		let i=i+1
+	done
 	done
 
 done

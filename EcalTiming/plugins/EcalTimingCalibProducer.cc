@@ -42,8 +42,10 @@ EcalTimingCalibProducer::EcalTimingCalibProducer(const edm::ParameterSet& iConfi
 	///\todo the min energy should be in ADC not in energy
 	_minRecHitEnergyStep(iConfig.getParameter<double>("minRecHitEnergyStep")),
 	_minRecHitEnergyNStep(iConfig.getParameter<double>("minRecHitEnergyNStep")),
-   _energyThresholdOffsetEB(iConfig.getParameter<double>("energyThresholdOffsetEB")),
-   _energyThresholdOffsetEE(iConfig.getParameter<double>("energyThresholdOffsetEE")),
+	_energyThresholdOffsetEB(iConfig.getParameter<double>("energyThresholdOffsetEB")),
+	_energyThresholdOffsetEE(iConfig.getParameter<double>("energyThresholdOffsetEE")),
+	_chi2ThresholdOffsetEB(iConfig.getParameter<double>("chi2ThresholdOffsetEB")),//added
+	_chi2ThresholdOffsetEE(iConfig.getParameter<double>("chi2ThresholdOffsetEE")),//added
 	_minEntries(iConfig.getParameter<unsigned int>("minEntries")),
 	_globalOffset(iConfig.getParameter<double>("globalOffset")),
 	_storeEvents(iConfig.getParameter<bool>("storeEvents")),
@@ -101,9 +103,9 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//check if rechit is valid
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
-	float energyThreshold = getEnergyThreshold(recHit.detid()) ;
-	if( recHit.energy() < (energyThreshold)) return false; // minRecHitEnergy in ADC for EB
-	//if(recHit.detid().subdetId() == EcalEndcap && recHit.energy() < 2 * (_minRecHitEnergy+_minRecHitEnergyStep*_iter)) return false;
+	float energyThreshold = getEnergyThreshold(recHit.detid()); 
+	float chi2Threshold = getChi2Threshold(recHit.detid()); 
+	if( (recHit.energy() < energyThreshold) || (recHit.chi2() > chi2Threshold)) return false; 
 
 	// add the EcalTimingEvent to the EcalCreateTimeCalibrations
 	EcalTimingEvent timeEvent(recHit);
@@ -171,6 +173,7 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	edm::ESHandle<CaloGeometry> pG;
 	iSetup.get<CaloGeometryRecord>().get(pG);
 	EcalRingCalibrationTools::setCaloGeometry(&(*pG));
+
 	endcapGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalEndcap);
 	barrelGeometry_ =  pG->getSubdetectorGeometry(DetId::Ecal, EcalBarrel);
 
@@ -199,12 +202,8 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 	// recHit_itr is of type: edm::Handle<EcalRecHitCollection>::const_iterator
 	for(auto  recHit_itr = ebRecHitHandle->begin(); recHit_itr != ebRecHitHandle->end(); ++recHit_itr) {
 		// add the recHit to the list of recHits used for calibration (with the relative information)
+
 		if(addRecHit(*recHit_itr, _eventTimeMap)) {
-			//EBDetId id(recHit.detid());
-			// if(id.ieta() == -75 && id.iphi() == 119) {
-			// 	std::cout << "RawID\t" << id.rawId() << std::endl;
-			// 	return false;
-			// }
 			timeEB.add(EcalTimingEvent(*recHit_itr), false);
 		}
 	}
@@ -257,11 +256,11 @@ bool EcalTimingCalibProducer::filter(edm::Event& iEvent, const edm::EventSetup& 
 		EcalTimingEvent event = _isSplash ? correctGlobalOffset(it.second, splashDir, bunchCorr) : it.second;
 
 		if(_makeEventPlots) plotRecHit(event);
-		_timeCalibMap[it.first].add(event,_storeEvents);
+		_timeCalibMap[it.first].add(event, _storeEvents);
 
 		//Find the CCU(tower) that this crystal belongs to
 		unsigned int elecID = getElecID(it.first);
-		_HWCalibrationMap[elecID].add(event,false);
+		_HWCalibrationMap[elecID].add(event, false);
 
 	}
 
@@ -282,8 +281,7 @@ void EcalTimingCalibProducer::endJob()
 	// set the values in _calibConstants, _calibErrors, _offsetConstant
 
 #ifdef DEBUG
-	for (auto it : _HWCalibrationMap)
-	{
+	for (auto it : _HWCalibrationMap) {
 		if	(abs(it.second.mean()) > HW_UNIT * 1.5) std::cout <<  "HW: " << it.first << ' ' << it.second.mean() << std::endl;
 	}
 #endif
@@ -297,7 +295,6 @@ void EcalTimingCalibProducer::endJob()
 		_timeCalibConstants.setValue(calibRecHit_itr->first.rawId(), correction);
 
 		unsigned int ds = DS_NONE;
-		//TODO: This probably shouldn't be commented out. Move the stat check into the individual functions?
 		if(calibRecHit_itr->second.num() > 50) {
 			// check the asymmetry of the distribution: if asymmetric, dump the full set of events for further offline studies
 			if(fabs(calibRecHit_itr->second.getSkewnessWithinNSigma(n_sigma, 10)) > _maxSkewnessForDump)  {
@@ -315,21 +312,19 @@ void EcalTimingCalibProducer::endJob()
 		}
 
 		unsigned int elecID = getElecID(calibRecHit_itr->first);
-		if( abs(_HWCalibrationMap[elecID].mean()) > HW_UNIT * 1.5)
-		{
+		if( abs(_HWCalibrationMap[elecID].mean()) > HW_UNIT * 1.5) {
 			ds |= DS_CCU_OOT;
 		}
 
 		if((calibRecHit_itr->first.rawId() == EBCRYex) ||
-				(calibRecHit_itr->first.rawId() == EECRYex)) ds |= DS_CRYS;
+		        (calibRecHit_itr->first.rawId() == EECRYex)) ds |= DS_CRYS;
 
 		int iRing = _ringTools.getRingIndexInSubdet(calibRecHit_itr->first);
 
 		if(calibRecHit_itr->first.subdetId() == EcalBarrel && iRing == EBRING) ds |= DS_RING;
 		else if(calibRecHit_itr->first.subdetId() == EcalEndcap && (iRing == EEmRING || iRing == EEpRING )) ds |= DS_RING;
 
-		if(ds != DS_NONE)
-		{
+		if(ds != DS_NONE) {
 			int ix, iy, iz;
 			if(calibRecHit_itr->first.subdetId() == EcalBarrel) {
 				EBDetId id(calibRecHit_itr->first);
@@ -344,7 +339,6 @@ void EcalTimingCalibProducer::endJob()
 			}
 			calibRecHit_itr->second.dumpToTree(dumpTree, ix, iy, iz, ds, elecID, iRing);
 		}
-
 		// add filing Energy hists here
 	}
 
@@ -360,7 +354,6 @@ void EcalTimingCalibProducer::endJob()
 	dumpCalibration(filename);
 	sprintf(filename, "%s-corr.dat", _outputDumpFileName.substr(0, _outputDumpFileName.find(".root")).c_str()); //text file holding constants
 	dumpCorrections(filename);
-	// save the xml
 }
 
 void EcalTimingCalibProducer::dumpCorrections(std::string filename)
@@ -374,12 +367,12 @@ void EcalTimingCalibProducer::dumpCorrections(std::string filename)
 		if(id_.subdetId() == EcalBarrel) {
 			EBDetId id(id_);
 			fout << id.ieta() << "\t" << id.iphi() << "\t" << 0
-			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
+			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2, 10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
 			     << "\t" << id.rawId() << std::endl;
 		} else {
 			EEDetId id(id_);
 			fout << id.ix() << "\t" << id.iy() << "\t" << id.zside()
-			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2,10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
+			     << "\t" << calibRecHit_itr->second.getMeanWithinNSigma(2, 10) << "\t" << calibRecHit_itr->second.stdDev() << "\t" << calibRecHit_itr->second.num() << "\t" << calibRecHit_itr->second.meanE()
 			     << "\t" << id.rawId() << std::endl;
 		}
 	}
@@ -410,7 +403,7 @@ void EcalTimingCalibProducer::dumpCalibration(std::string filename)
 
 	for(unsigned int i = 0; i < _timeCalibConstants.endcapItems().size(); ++i) {
 		EEDetId id(EEDetId::detIdFromDenseIndex(i)); // this is a stupid thing that I'm obliged to do due to the stupid structure of the ECAL container
-		fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[i] << "\t" << id.rawId() << std::endl;	
+		fout << id.ix() << "\t" << id.iy() << "\t" << id.zside() << "\t" << _timeCalibConstants.endcapItems()[i] << "\t" << id.rawId() << std::endl;
 	}
 	fout.close();
 }
@@ -422,17 +415,20 @@ void EcalTimingCalibProducer::dumpCalibration(std::string filename)
 
 void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibrationMap::const_iterator cal_itr)
 {
-	int ix,iy,iz;
+	int ix, iy, iz;
 	int rawid = cal_itr->first.rawId();
 	if(cal_itr->first.subdetId() == EcalBarrel) {
 		EBDetId id(cal_itr->first);
 		// Fill Rechit Energy
 		EneMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.meanE()); // 2D energy map
-		TimeMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanWithinNSigma(2,10)); // 2D time map
-		TimeErrorMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+		TimeMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanWithinNSigma(2, 10)); // 2D time map
+		TimeErrorMapEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getMeanErrorWithinNSigma(2, 10));
 
 		RechitEneEB_->Fill(cal_itr->second.meanE());   // 1D histogram
-		RechitTimeEB_->Fill(cal_itr->second.getMeanWithinNSigma(2,10)); // 1D histogram
+		RechitTimeEB_->Fill(cal_itr->second.getMeanWithinNSigma(2, 10)); // 1D histogram
+
+		// Fill Occupancy histo
+		OccupancyEB_->Fill(id.ieta(), id.iphi(), cal_itr->second.getNumWithinNSigma(2, 10));
 
 		ix = id.ieta();
 		iy = id.iphi();
@@ -443,25 +439,30 @@ void EcalTimingCalibProducer::FillCalibrationCorrectionHists(EcalTimeCalibration
 		EEDetId id(cal_itr->first);
 		if(id.zside() < 0) {
 			EneMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
-			TimeMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
-			TimeErrorMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+			TimeMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2, 10));
+			TimeErrorMapEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2, 10));
 
 			RechitEneEEM_->Fill(cal_itr->second.meanE());
-			RechitTimeEEM_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+			RechitTimeEEM_->Fill(cal_itr->second.getMeanWithinNSigma(2, 10));
+
+			OccupancyEEM_->Fill(id.ix(), id.iy(), cal_itr->second.getNumWithinNSigma(2, 10));
+
 		} else {
 			EneMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.meanE());
-			TimeMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2,10));
-			TimeErrorMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2,10));
+			TimeMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanWithinNSigma(2, 10));
+			TimeErrorMapEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getMeanErrorWithinNSigma(2, 10));
 
 			RechitEneEEP_->Fill(cal_itr->second.meanE());
-			RechitTimeEEP_->Fill(cal_itr->second.getMeanWithinNSigma(2,10));
+			RechitTimeEEP_->Fill(cal_itr->second.getMeanWithinNSigma(2, 10));
+
+			OccupancyEEP_->Fill(id.ix(), id.iy(), cal_itr->second.getNumWithinNSigma(2, 10));
+
 		}
 
 		ix = id.ix();
 		iy = id.iy();
 		iz = id.zside();
 	}
-
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 	cal_itr->second.dumpCalibToTree(timingTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing);
 }
@@ -470,6 +471,7 @@ void EcalTimingCalibProducer::FillHWCorrectionHists(EcalTimeCalibrationMap::cons
 {
 	unsigned int elecID = getElecID(cal_itr->first);
 	float time = _HWCalibrationMap[elecID].mean();
+
 	if(cal_itr->first.subdetId() == EcalBarrel) {
 		EBDetId id(cal_itr->first);
 		// Fill Rechit Energy
@@ -488,8 +490,8 @@ void EcalTimingCalibProducer::FillHWCorrectionHists(EcalTimeCalibrationMap::cons
 void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::const_iterator cal_itr, std::vector< std::pair<float, EcalCrystalTimingCalibration*> > energyStability)
 {
 
-	int ix,iy,iz;
-  	int rawid = cal_itr->first.rawId();
+	int ix, iy, iz;
+	int rawid = cal_itr->first.rawId();
 	//choose which map to store in
 	if(cal_itr->first.subdetId() == EcalBarrel) {
 		EBDetId id(cal_itr->first);
@@ -502,7 +504,6 @@ void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::c
 		iy = id.iy();
 		iz = id.zside();
 	}
-
 	int iRing = _ringTools.getRingIndexInSubdet(cal_itr->first);
 
 	// Add min_energy to the tree which gets filld inside the dump function
@@ -514,10 +515,9 @@ void EcalTimingCalibProducer::FillEnergyStabilityHists(EcalTimeCalibrationMap::c
 	if(energyStabilityTree->GetBranch("index") == NULL) energyStabilityTree->Branch("index", &index, "index/b");
 	energyStabilityTree->SetBranchAddress("index", &index);
 
-	for(auto it = energyStability.begin(); it!=energyStability.end(); it++)
-	{
+	for(auto it = energyStability.begin(); it != energyStability.end(); it++) {
 		min_energy = it->first;
-		it->second->dumpCalibToTree(energyStabilityTree,rawid,ix,iy,iz,getElecID(cal_itr->first),iRing);
+		it->second->dumpCalibToTree(energyStabilityTree, rawid, ix, iy, iz, getElecID(cal_itr->first), iRing);
 		index++;
 	}
 
@@ -540,6 +540,8 @@ void EcalTimingCalibProducer::initEventHists(TFileDirectory fdir)
 //
 void EcalTimingCalibProducer::initHists(TFileDirectory fdir)
 {
+	std::cout << "Initializing histos" << std::endl;
+
 	EneMapEB_ = fdir.make<TProfile2D>("EneMapEB", "RecHit Energy[GeV] EB profile map;i#eta; i#phi;E[GeV]", 171, -85, 86, 360, 1., 361.);
 	TimeMapEB_ = fdir.make<TProfile2D>("TimeMapEB", "Mean Time [ns] EB profile map; i#eta; i#phi;Time[ns]", 171, -85, 86, 360, 1., 361.);
 
@@ -566,10 +568,16 @@ void EcalTimingCalibProducer::initHists(TFileDirectory fdir)
 	RechitEnergyTimeEB  = fdir.make<TH2F>("RechitEnergyTimeEB",  "RecHit Energy vs Time EB; Rechit Energy[GeV]; Time[ns]; Events", 200, 0.0, 100.0,  100, -15, 30);
 
 	// HW Histograms
-	
+
 	HWTimeMapEEP_ = fdir.make<TProfile2D>("HWTimeMapEEP", "Mean HW Time[ns] profile map EE+;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
 	HWTimeMapEEM_ = fdir.make<TProfile2D>("HWTimeMapEEM", "Mean HW Time[ns] profile map EE-;ix;iy; Time[ns]", 100, 1, 101, 100, 1, 101);
 	HWTimeMapEB_  = fdir.make<TProfile2D>("HWTimeMapEB",  "Mean HW Time[ns] EB profile map; i#eta; i#phi;Time[ns]", 171, -85, 86, 360, 1., 361.);
+
+	//Occupancy histograms
+
+	OccupancyEB_  = fdir.make<TH2D>("OccupancyEB", "Occupancy EB; i#eta; i#phi; #Hits", 171, -85, 86, 361, 1., 361.);
+	OccupancyEEM_ = fdir.make<TH2D>("OccupancyEEM", "OccupancyEEM; iy; ix; #Hits", 100, 1, 101, 100, 1, 101);
+	OccupancyEEP_ = fdir.make<TH2D>("OccupancyEEP", "OccupancyEEP; iy; ix; #Hits", 100, 1, 101, 100, 1, 101);
 
 }
 

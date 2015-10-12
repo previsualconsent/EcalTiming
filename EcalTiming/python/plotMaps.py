@@ -102,6 +102,8 @@ def addFitToPlot(h,outfilename):
 
 
 def plotMaps(tree, outdir, prefix=""):
+	low = -1
+	hi = 1
 	# dictionaries to store histograms
 	time = dict()
 	time_rel2012 = dict()
@@ -154,7 +156,7 @@ def plotMaps(tree, outdir, prefix=""):
 		initHists(prefix,timeError, initMap, key, "timeError", "Time Error[ns]")
 		initHists(prefix,timeError1d, inittime1d, key, "timeError1d", "Time Error Test [ns]", low=0, hi=.2)
 		initHists(prefix,stdDev, initMap, key, "stdDev", "Std Dev [ns]")
-		initHists(prefix,time1d, inittime1d, key, "time1d", "time1d")
+		initHists(prefix,time1d, inittime1d, key, "time1d", "time1d", low=low, hi=hi)
 
 		initHists(prefix,occupancy, initMap, key, "occupancy", "Occupancy")
 		initHists(prefix,energy, initMap, key, "energy", "Energy [GeV]")
@@ -211,7 +213,7 @@ def plotMaps(tree, outdir, prefix=""):
 
 	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in CCU_maps:
-		CCU_maps[key].SetAxisRange(-2, 2, "Z")
+		CCU_maps[key].SetAxisRange(low,hi, "Z")
 		CCU_maps[key].SetZTitle("[ns]")
 		CCU_maps[key].Draw("colz")
 		c.SaveAs(outdir + "/" + CCU_maps[key].GetName() + ".png")
@@ -232,9 +234,9 @@ def plotMaps(tree, outdir, prefix=""):
 		time[key].SetAxisRange(-5,5,"Z")
 		time[key].Draw("colz")
 		c.SaveAs(outdir + "/" + time[key].GetName() + ".5.png")
-		time[key].SetAxisRange(-2,2,"Z")
+		time[key].SetAxisRange(low,hi,"Z")
 		time[key].Draw("colz")
-		c.SaveAs(outdir + "/" + time[key].GetName() + ".2.png")
+		c.SaveAs(outdir + "/" + time[key].GetName() + ".png")
 
 	c = ROOT.TCanvas("c","c",1600,1200)
 	for key in time_rel2012:
@@ -340,9 +342,9 @@ if __name__ == "__main__":
 			else: raise
 
 	mkdir_p(outdir)
-	shutil.copy("plots/index.php", outdir)
+	#shutil.copy("plots/index.php", outdir)
 
 	file = ROOT.TFile.Open(filename)
-	tree = file.Get("filter/EcalSplashTiming/timingTree")
+	tree = file.Get("timing/EcalSplashTiming/timingTree")
 	time = plotMaps(tree, outdir, prefix = prefix)
 

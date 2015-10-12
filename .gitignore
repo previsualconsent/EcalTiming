@@ -1,5 +1,10 @@
 *.png
 *.root
 __init__.py
+*.old
+pippo*
+*processDump.py
 *.pyc
 html/*
+LSF*
+*.list

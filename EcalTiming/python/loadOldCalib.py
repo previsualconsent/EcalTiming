@@ -1,12 +1,13 @@
 import ROOT
 from EcalTiming.EcalTiming.txt2tree import txt2tree
 from collections import namedtuple
+import math
 
 Crystal = namedtuple('Crystal',("ix", "iy", "iz", "elecID", "FED", "CCU", "iRing"))
 Calib = namedtuple('Calib',("time", "stddev", "num", "energy","rawid" ))
 
 
-det_name = {0:"EB", -1:"EEM", 1:"EEP"}
+det_name = {0:"EB", -1:"EEM", 1:"EEP", (0,-1):"EBM", (0,1):"EBP"}
 
 def getCalibFromTree(tree):
 	calibMap = dict()
@@ -136,6 +137,37 @@ def calcMeanBySD(map):
 
 	return dict( [ (iz, sum[iz]/num[iz]) for iz in [0,-1,1] ] )
 
+def calcMeanByCCU(map):
+	global rawidMap
+	CCU_sum = dict()
+	CCU_num = dict()
+	for id in map:
+		key =(rawidMap[id].FED, rawidMap[id].CCU)
+		CCU_sum[key] = 0
+		CCU_num[key] = 0
+
+	for id in map:
+		key =(rawidMap[id].FED, rawidMap[id].CCU)
+		CCU_sum[key] += map[id]
+		CCU_num[key] += 1
+	
+	out_map = dict()
+	for id in map:
+		key =(rawidMap[id].FED, rawidMap[id].CCU)
+		out_map[id] = CCU_sum[key]/CCU_num[key]
+
+	printed = set()
+	for id,time in out_map.items():
+		if abs(time) > 1.:
+			c = rawidMap[id]
+			k = (c.FED, c.CCU)
+			if k not in printed:
+				print c.FED, c.CCU, c.ix, c.iy, c.iz, time
+				printed.add(k)
+	return out_map
+
+
+
 def plot1d(map, dir, name, low, hi,xtitle="[ns]", ytitle="Events"):
 	global rawidMap
 
@@ -202,6 +234,66 @@ def plot2d(map, dir, name, low, hi,setLogz=False):
 		h.SetAxisRange(low,hi,"Z")
 		h.Draw("colz")
 		c.SaveAs(dir + '/' + h.GetName() + ".png")
+
+def calcMeanByiRing(m,iRings):
+	global rawidMap
+	time_sum  = dict(zip(iRings,[0]*len(iRings)))
+	time_sum2 = dict(zip(iRings,[0]*len(iRings)))
+	time_num  = dict(zip(iRings,[0]*len(iRings)))
+	
+	for id,time in m.iteritems():
+		try:
+			crys = rawidMap[id]
+		except KeyError:
+			print id, "not found"
+			continue
+		key = (crys.iz, crys.iRing)
+		if key in iRings:
+			time_sum[key] += time
+			time_sum2[key] += time*time
+			time_num[key] += 1
+	
+	mean = dict()
+	stddev = dict()
+	for k in time_sum:
+		if time_num[k]:
+			mean[k] = time_sum[k]/time_num[k]
+			stddev[k] = math.sqrt(time_sum2[k]/time_num[k] - mean[k]**2)
+	return mean,stddev
+
+def calcMean(m):
+	global rawidMap
+	time_sum = dict(zip(det_name.keys(),[0]*len(det_name)))
+	time_sum2 = dict(zip(det_name.keys(),[0]*len(det_name)))
+	time_num = dict(zip(det_name.keys(),[0]*len(det_name)))
+	
+	for id,time in m.iteritems():
+		try:
+			crys = rawidMap[id]
+		except KeyError:
+			print id, "not found"
+			continue
+		if crys.iz == 0:
+			side = math.copysign(1,crys.ix)
+			time_sum[(0,side)] += time
+			time_sum2[(0,side)] += time*time
+			time_num[(0,side)] += 1
+			time_sum[0] += time
+			time_sum2[0] += time*time
+			time_num[0] += 1
+		else:
+			time_sum[crys.iz] += time
+			time_sum2[crys.iz] += time*time
+			time_num[crys.iz] += 1
+	
+	mean = dict()
+	stddev = dict()
+	for k in time_sum:
+		if time_num[k]:
+			mean[k] = time_sum[k]/time_num[k]
+			stddev[k] = math.sqrt(time_sum2[k]/time_num[k] - mean[k]**2)
+	return mean,stddev
+
 
 if __name__ == "__main__":
 	print "hi"
