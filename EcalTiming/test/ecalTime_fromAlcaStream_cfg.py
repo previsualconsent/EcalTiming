@@ -61,6 +61,12 @@ options.register('streamName',
                  VarParsing.VarParsing.multiplicity.singleton,
                  VarParsing.VarParsing.varType.string,
                  "type of stream: AlCaPhiSym or AlCaP0")
+options.register('loneBunch',
+                   1,
+                   VarParsing.VarParsing.multiplicity.singleton,
+                   VarParsing.VarParsing.varType.int,
+                   "0=No, 1=Yes"
+                 )
 options.register('globaltag',
                  '',
                  VarParsing.VarParsing.multiplicity.singleton,
@@ -158,12 +164,7 @@ process.spashesHltFilter = HLTrigger.HLTfilters.hltHighLevel_cfi.hltHighLevel.cl
 
 ## GlobalTag Conditions Related
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-<<<<<<< HEAD
-#process.GlobalTag = GlobalTag(process.GlobalTag, 'GR_P_V56', '') #run2_data', '')
 process.GlobalTag = GlobalTag(process.GlobalTag, options.globaltag, '')
-=======
-process.GlobalTag = GlobalTag(process.GlobalTag, '74X_dataRun2_Prompt_v2', '') #run2_data', '')
->>>>>>> 9578679... new coding... added Lone Trigger filter, infoTree is before the cut sequence (see the gain after different cuts offline), added the High Pile Up cfg
 
 ## Process Digi To Raw Step
 process.digiStep = cms.Sequence(process.ecalDigis  + process.ecalPreshowerDigis)
@@ -173,13 +174,13 @@ process.digiStep = cms.Sequence(process.ecalDigis  + process.ecalPreshowerDigis)
 
 
 ### Print Out Some Messages
-#process.MessageLogger = cms.Service("MessageLogger",
-#    cout = cms.untracked.PSet(
-#        threshold = cms.untracked.string('WARNING')
-#    ),
-#    categories = cms.untracked.vstring('ecalTimeTree'),
-#    destinations = cms.untracked.vstring('cout')
-#)
+process.MessageLogger = cms.Service("MessageLogger",
+    cout = cms.untracked.PSet(
+        threshold = cms.untracked.string('WARNING')
+    ),
+    categories = cms.untracked.vstring('ecalTimeTree'),
+    destinations = cms.untracked.vstring('cout')
+)
 
 # enable the TrigReport and TimeReport
 process.options = cms.untracked.PSet(
@@ -243,6 +244,18 @@ process.dummyHits = cms.EDProducer("DummyRechitDigis",
                                     barrelDigiCollection   = cms.untracked.string("dummyBarrelDigisPi0"),
                                     endcapDigiCollection   = cms.untracked.string("dummyEndcapDigisPi0"))
 
+##ADDED
+# TRIGGER RESULTS FILTER                                                                                                                                                                                                                                                                   
+process.triggerSelectionLoneBunch = cms.EDFilter( "TriggerResultsFilter",
+                                                   triggerConditions = cms.vstring('L1_AlwaysTrue'),
+                                                   hltResults = cms.InputTag( "TriggerResults", "", "HLT" ),
+                                                   l1tResults = cms.InputTag( "hltGtDigis" ),
+                                                   l1tIgnoreMask = cms.bool( False ),
+                                                   l1techIgnorePrescales = cms.bool( False ),
+                                                   daqPartitions = cms.uint32( 1 ),
+                                                   throw = cms.bool( True )
+                                                   )
+
 process.filter=cms.Sequence()
 if(options.isSplash==1):
     process.filter+=process.spashesHltFilter
@@ -285,8 +298,8 @@ else:
 ### Process Full Path
 if(options.isSplash==0):
     process.digiStep = cms.Sequence()
-
-
+if(options.loneBunch==1):
+	process.filter+=process.triggerSelectionLoneBunch
 
 evtPlots = True if options.isSplash else False
 

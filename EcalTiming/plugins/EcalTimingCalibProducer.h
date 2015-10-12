@@ -134,7 +134,7 @@ private:
 	EcalTimeCalibrationMap _timeCalibMap; ///< calibration map: contains the time shift for each crystal
 	EventTimeMap _eventTimeMap;           ///< container of recHits passing selection in the event (reset at each event)
 	EcalHWCalibrationMap _HWCalibrationMap; //!<  The keys for this map are EcalElectronicIds with xtalid = stripid = 1
-															///< calibration map for the CCU's (Hardware Constants). 
+	///< calibration map for the CCU's (Hardware Constants).
 
 	// For finding averages for specific eta ring
 	EcalCrystalTimingCalibration timeEEP; ///< global time calibration of EE+
@@ -151,13 +151,10 @@ public:
 	~EcalTimingCalibProducer();                        // default destructor
 
 
-        virtual void beginJob() override;
+	virtual void beginJob() override;
 	virtual bool filter(edm::Event&, const edm::EventSetup&) override;
-        virtual void endJob() override;
-        
-        int OccupancyEB[171][361]  = {{0}}; //added occupancy plots
-        int OccupancyEEM[101][101] = {{0}};
-        int OccupancyEEP[101][101] = {{0}};
+	virtual void endJob() override;
+
 
 private:
 	// ----------member data ---------------------------
@@ -175,13 +172,13 @@ private:
 	unsigned int _recHitMin; ///< require at least this many rec hits to count the event
 	double _minRecHitEnergyStep; ///< to check step size to check energy stability
 	double _minRecHitEnergyNStep; ///< number of steps to check energy stability
-   double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
-   double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
-   double _chi2ThresholdOffsetEB; //chi2 square thr for the Barrel --- Added
-   double _chi2ThresholdOffsetEE; //chi2 square thr for the Endcap --- Added
+	double _energyThresholdOffsetEB; ///< energy to add to the minimum energy thresholc
+	double _energyThresholdOffsetEE; ///< energy to add to the minimum energy thresholc
+	double _chi2ThresholdOffsetEB; //chi2 square thr for the Barrel --- Added
+	double _chi2ThresholdOffsetEE; //chi2 square thr for the Endcap --- Added
 	unsigned int _minEntries; ///< require a minimum number of entries in a ring to do averages
 	float        _globalOffset;    ///< time to subtract from every event
-   bool _storeEvents;
+	bool _storeEvents;
 	bool _produceNewCalib; ///< true if you don't want to use the values in DB and what to extract new absolute calibrations, if false iteration does not work
 	std::string _outputDumpFileName; ///< name of the output file for the calibration constants' dump
 	float _maxSkewnessForDump;
@@ -229,19 +226,19 @@ private:
 		return (elecMap_->getElectronicsId(id).rawId() >> 6) & 0x3FFF;
 	}
 	//float getEnergyThreshold(const DetId detid)
-        std::pair <float, float> getEnergyThreshold(const DetId detid)
+	std::pair <float, float> getEnergyThreshold(const DetId detid)
 	{
 		int iRing = _ringTools.getRingIndexInSubdet(detid);
-                //std::pair <float, float> outputThr = detid.subdetId() == EcalBarrel ? {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB} : {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE}
-                std::pair <float, float> outputThr;
-                if (detid.subdetId() == EcalBarrel){
-                  outputThr = {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB};
-                }else{
-                  outputThr = {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE};
-                }
-		//return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :  
+		//std::pair <float, float> outputThr = detid.subdetId() == EcalBarrel ? {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB} : {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE}
+		std::pair <float, float> outputThr;
+		if (detid.subdetId() == EcalBarrel) {
+			outputThr = {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB};
+		} else {
+			outputThr = {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE};
+		}
+		//return detid.subdetId() == EcalBarrel ? 13 * 0.04  + _energyThresholdOffsetEB :
 		//	20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
-                return outputThr;
+		return outputThr;
 	}
 
 	std::map<DetId, float>  _CrysEnergyMap;
@@ -252,7 +249,6 @@ private:
 	TTree *dumpTree;
 	TTree * timingTree;
 	TTree * energyStabilityTree;
-        TTree * infoTree;
 
 	// Mean Histograms
 
@@ -299,17 +295,16 @@ private:
 	TH2F* RechitEnergyTimeEEM;
 	TH2F* RechitEnergyTimeEEP;
 
-        //Occupancy plots
-        TH2D* OccupancyEB_;
-        TH2D* OccupancyEEM_;
-        TH2D* OccupancyEEP_;
+	//Occupancy plots
+	TH2D* OccupancyEB_;
+	TH2D* OccupancyEEM_;
+	TH2D* OccupancyEEP_;
 
 	EcalRingCalibrationTools _ringTools;
 	const CaloSubdetectorGeometry * endcapGeometry_;
 	const CaloSubdetectorGeometry * barrelGeometry_;
 
-   const EcalElectronicsMapping * elecMap_;
-        int _event_tracker;
+	const EcalElectronicsMapping * elecMap_;
 
 	unsigned int _iter;
 };
