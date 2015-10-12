@@ -223,16 +223,22 @@ private:
 	{
 		return (elecMap_->getElectronicsId(id).rawId() >> 6) & 0x3FFF;
 	}
-	std::pair <float, float> getEnergyThreshold(const DetId detid)
+	float getEnergyThreshold(const DetId detid)
 	{
 		int iRing = _ringTools.getRingIndexInSubdet(detid);
-		std::pair <float, float> outputThr;
 		if (detid.subdetId() == EcalBarrel) {
-			outputThr = {13 * 0.04  + _energyThresholdOffsetEB, _chi2ThresholdOffsetEB};
+			return 13 * 0.04  + _energyThresholdOffsetEB;
 		} else {
-			outputThr = {20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE, _chi2ThresholdOffsetEE};
+			return 20 * (79.29 - 4.148 * iRing + 0.2442 * iRing * iRing ) / 1000  + _energyThresholdOffsetEE;
 		}
-		return outputThr;
+	}
+	float getChi2Threshold(const DetId detid)
+	{
+		if (detid.subdetId() == EcalBarrel) {
+			return _chi2ThresholdOffsetEB;
+		} else {
+			return _chi2ThresholdOffsetEE;
+		}
 	}
 
 	std::map<DetId, float>  _CrysEnergyMap;

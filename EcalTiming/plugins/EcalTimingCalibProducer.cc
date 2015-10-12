@@ -103,8 +103,9 @@ bool EcalTimingCalibProducer::addRecHit(const EcalRecHit& recHit, EventTimeMap& 
 	//check if rechit is valid
 	if(! recHit.checkFlags(_recHitFlags)) return false;
 
-	std::pair<float, float> energyThreshold = getEnergyThreshold(recHit.detid()); // first->energy threshold, second->chi2 threshold
-	if( (recHit.energy() < (energyThreshold.first)) || (recHit.chi2() > energyThreshold.second)) return false; // minRecHitEnergy in ADC for EB - the minChi2 value has to be implemented separately like the minEnergy
+	float energyThreshold = getEnergyThreshold(recHit.detid()); 
+	float chi2Threshold = getChi2Threshold(recHit.detid()); 
+	if( (recHit.energy() < energyThreshold) || (recHit.chi2() > chi2Threshold)) return false; 
 
 	// add the EcalTimingEvent to the EcalCreateTimeCalibrations
 	EcalTimingEvent timeEvent(recHit);
@@ -303,8 +304,8 @@ void EcalTimingCalibProducer::endJob()
 
 			// check if result is stable as function of energy
 			std::vector< std::pair<float, EcalCrystalTimingCalibration*> > energyStability;
-			std::pair <float, float> energyThreshold = getEnergyThreshold(calibRecHit_itr->first);
-			if(! calibRecHit_itr->second.isStableInEnergy(energyThreshold.first, energyThreshold.first + _minRecHitEnergyStep * _minRecHitEnergyNStep, _minRecHitEnergyStep, energyStability)) {
+			float energyThreshold = getEnergyThreshold(calibRecHit_itr->first);
+			if(! calibRecHit_itr->second.isStableInEnergy(energyThreshold, energyThreshold + _minRecHitEnergyStep * _minRecHitEnergyNStep, _minRecHitEnergyStep, energyStability)) {
 				ds |= DS_UNSTABLE_EN;
 			}
 			FillEnergyStabilityHists(calibRecHit_itr, energyStability);
