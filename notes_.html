@@ -78,7 +78,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="title">Notes </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>Create a collection of compressed rechits, storing only the detid, energy and time. detid is a uint32_t Time is stored as a int16_t with a range of +/- 32.767 ns Energy is stored as a uint16_t with a max of 655.35 GeV so each hit is 8 bytes.</p>
+<div class="textblock"><p>Create a collection of compressed rechits, storing only the detid, energy and time.</p>
+<ul>
+<li>detid is a uint32_t</li>
+<li>Time is stored as a int16_t with a range of +/- 32.767 ns</li>
+<li>Energy is stored as a uint16_t with a max of 655.35 GeV so each hit is 8 bytes.</li>
+</ul>
 <p>Only hits with flags = 0 will be stored in the collection.</p>
 <p>The collection will be read in by the <a class="el" href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a> class which will perform the analysis</p>
 <p>The analysis will apply an energy threshold, calculate mean/stddev of timing, and recalculate the mean/stddev inside a 2 sigma window.</p>
@@ -88,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 18:38:49 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 19 2016 18:53:55 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
