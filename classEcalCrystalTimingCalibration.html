@@ -135,9 +135,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalCrystalTimingCalibration.html#aa55feba1929cc4ae7adf7ae2170be594">dumpToTree</a> (TTree *tree, int ix_, int iy_, int iz_, unsigned int status_, unsigned int elecID_, int iRing_)</td></tr>
 <tr class="memdesc:aa55feba1929cc4ae7adf7ae2170be594"><td class="mdescLeft">&#160;</td><td class="mdescRight">dump the full set of events in a TTree: need an empty tree <br/></td></tr>
 <tr class="separator:aa55feba1929cc4ae7adf7ae2170be594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9bcb2df3ca3163b5e667422339722fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9bcb2df3ca3163b5e667422339722fa"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa">dumpCalibToTree</a> (TTree *tree, int rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) const </td></tr>
-<tr class="memdesc:ab9bcb2df3ca3163b5e667422339722fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">dump the callibratoin to the tree <br/></td></tr>
+<tr class="memitem:ab9bcb2df3ca3163b5e667422339722fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa">dumpCalibToTree</a> (TTree *tree, int rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) const </td></tr>
 <tr class="separator:ab9bcb2df3ca3163b5e667422339722fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a671ef53e6c0de14b16a44680ca12a728"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a671ef53e6c0de14b16a44680ca12a728"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalCrystalTimingCalibration.html#a671ef53e6c0de14b16a44680ca12a728">isStableInEnergy</a> (float min, float max, float step, std::vector&lt; std::pair&lt; float, <a class="el" href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a> * &gt; &gt; &amp;ret)</td></tr>
@@ -187,6 +185,74 @@ std::vector&lt; <a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Description: add a description here This class contains all the timing information for a single crystal </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="ab9bcb2df3ca3163b5e667422339722fa"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void EcalCrystalTimingCalibration::dumpCalibToTree </td>
+          <td>(</td>
+          <td class="paramtype">TTree *&#160;</td>
+          <td class="paramname"><em>tree</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rawid_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ix_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iy_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iz_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">unsigned int&#160;</td>
+          <td class="paramname"><em>elecID_</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>iRing_</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>dump the callibratoin to the tree </p>
+
+<p>References <a class="el" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a">getMeanErrorWithinNSigma()</a>, <a class="el" href="classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48">getMeanWithinNSigma()</a>, and <a class="el" href="classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a">getNumWithinNSigma()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classEcalCrystalTimingCalibration_ab9bcb2df3ca3163b5e667422339722fa_cgraph.png" border="0" usemap="#classEcalCrystalTimingCalibration_ab9bcb2df3ca3163b5e667422339722fa_cgraph" alt=""/></div>
+<map name="classEcalCrystalTimingCalibration_ab9bcb2df3ca3163b5e667422339722fa_cgraph" id="classEcalCrystalTimingCalibration_ab9bcb2df3ca3163b5e667422339722fa_cgraph">
+<area shape="rect" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="245,6,440,48"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48" title="average Energy (mean of the Energy distribution) " alt="" coords="728,64,920,107"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a" title="returns the num calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="488,123,680,166"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="488,6,680,48"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5b5b1df8a43ba47e838375fd917aa3b5" title="calculate sum, sum2, sum3, n for time if time within n x stdDev and store the result ..." alt="" coords="968,94,1160,136"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a6a0685fed9b017364a5806e08cf656d4" title="average time (mean of the time distribution) " alt="" coords="1208,94,1400,136"/></map>
+</div>
+</p>
+
+</div>
+</div>
 <a class="anchor" id="a5d8678a7867daf8f04fc43e8dab14d48"></a>
 <div class="memitem">
 <div class="memproto">
@@ -230,7 +296,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classEcalCrystalTimingCalibration_a5d8678a7867daf8f04fc43e8dab14d48_icgraph.png" border="0" usemap="#classEcalCrystalTimingCalibration_a5d8678a7867daf8f04fc43e8dab14d48_icgraph" alt=""/></div>
 <map name="classEcalCrystalTimingCalibration_a5d8678a7867daf8f04fc43e8dab14d48_icgraph" id="classEcalCrystalTimingCalibration_a5d8678a7867daf8f04fc43e8dab14d48_icgraph">
-<area shape="rect" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="dump the callibratoin to the tree " alt="" coords="728,41,920,84"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="487,37,679,80"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="245,92,437,135"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="485,104,680,147"/></map>
+<area shape="rect" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="EcalCrystalTimingCalibration\l::dumpCalibToTree" alt="" coords="728,41,920,84"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="487,37,679,80"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="245,92,437,135"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="485,104,680,147"/></map>
 </div>
 </p>
 
@@ -315,7 +381,7 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classEcalCrystalTimingCalibration_a6a0685fed9b017364a5806e08cf656d4_icgraph.png" border="0" usemap="#classEcalCrystalTimingCalibration_a6a0685fed9b017364a5806e08cf656d4_icgraph" alt=""/></div>
 <map name="classEcalCrystalTimingCalibration_a6a0685fed9b017364a5806e08cf656d4_icgraph" id="classEcalCrystalTimingCalibration_a6a0685fed9b017364a5806e08cf656d4_icgraph">
-<area shape="rect" href="classEcalCrystalTimingCalibration.html#a5b5b1df8a43ba47e838375fd917aa3b5" title="calculate sum, sum2, sum3, n for time if time within n x stdDev and store the result ..." alt="" coords="245,72,437,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="967,5,1159,48"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a" title="returns the num calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,189,917,232"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48" title="average Energy (mean of the Energy distribution) " alt="" coords="485,72,677,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="dump the callibratoin to the tree " alt="" coords="1208,130,1400,173"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,72,917,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="965,72,1160,114"/></map>
+<area shape="rect" href="classEcalCrystalTimingCalibration.html#a5b5b1df8a43ba47e838375fd917aa3b5" title="calculate sum, sum2, sum3, n for time if time within n x stdDev and store the result ..." alt="" coords="245,72,437,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="967,5,1159,48"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a" title="returns the num calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,189,917,232"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48" title="average Energy (mean of the Energy distribution) " alt="" coords="485,72,677,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="EcalCrystalTimingCalibration\l::dumpCalibToTree" alt="" coords="1208,130,1400,173"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,72,917,114"/><area shape="rect" href="classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="965,72,1160,114"/></map>
 </div>
 </p>
 
@@ -328,7 +394,7 @@ Here is the caller graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2015 20:02:35 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 19 2016 18:35:50 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

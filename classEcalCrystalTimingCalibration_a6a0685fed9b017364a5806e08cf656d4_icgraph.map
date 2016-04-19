@@ -3,7 +3,7 @@
 <area shape="rect" href="$classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7" title="returns the skewness calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="967,5,1159,48"/>
 <area shape="rect" href="$classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a" title="returns the num calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,189,917,232"/>
 <area shape="rect" href="$classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48" title="average Energy (mean of the Energy distribution) " alt="" coords="485,72,677,114"/>
-<area shape="rect" href="$classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="dump the callibratoin to the tree " alt="" coords="1208,130,1400,173"/>
+<area shape="rect" href="$classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa" title="EcalCrystalTimingCalibration\l::dumpCalibToTree" alt="" coords="1208,130,1400,173"/>
 <area shape="rect" href="$classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80" title="returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails " alt="" coords="725,72,917,114"/>
 <area shape="rect" href="$classEcalCrystalTimingCalibration.html#a5c9e24dd63124cbbba596ab72982495a" title="returns the error on the mean calculated within abs(mean+ n * stdDev) to reject tails ..." alt="" coords="965,72,1160,114"/>
 </map>
