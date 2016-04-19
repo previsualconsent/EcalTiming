@@ -82,8 +82,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <ul>
 <li>detid is a uint32_t</li>
 <li>Time is stored as a int16_t with a range of +/- 32.767 ns</li>
-<li>Energy is stored as a uint16_t with a max of 655.35 GeV so each hit is 8 bytes. Only hits with flags = 0 will be stored in the collection. A separate producer will make the collection which we can add in a sequence in the PhiSym analysis.</li>
+<li>Energy is stored as a uint16_t with a max of 655.35 GeV</li>
 </ul>
+<p>so each hit is 8 bytes. Only hits with flags = 0 will be stored in the collection. A separate producer will make the collection which we can add in a sequence in the PhiSym analysis.</p>
 <p>We need to store every time and energy to be able to determine the stability of our calculation with different cuts.</p>
 <p>The collection will be read in by the <a class="el" href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a> class which will perform the analysis The analysis will apply an energy threshold, calculate mean/stddev of timing, and recalculate the mean/stddev inside a 2 sigma window. This window helps avoid bias to highly out of time events.</p>
 <p>TODO: Find out about ChiSquared for cutting on out of time pileup.</p>
@@ -92,7 +93,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 19:32:13 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 19 2016 19:36:02 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
