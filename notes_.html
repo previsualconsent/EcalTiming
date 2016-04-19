@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.5"/>
-<title>EcalTiming: Class Index</title>
+<title>EcalTiming: Notes</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -37,8 +37,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div id="navrow1" class="tabs">
     <ul class="tablist">
       <li><a href="index.html"><span>Main&#160;Page</span></a></li>
-      <li><a href="pages.html"><span>Related&#160;Pages</span></a></li>
-      <li class="current"><a href="annotated.html"><span>Classes</span></a></li>
+      <li class="current"><a href="pages.html"><span>Related&#160;Pages</span></a></li>
+      <li><a href="annotated.html"><span>Classes</span></a></li>
       <li><a href="files.html"><span>Files</span></a></li>
       <li>
         <div id="MSearchBox" class="MSearchBoxInactive">
@@ -58,15 +58,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
       </li>
     </ul>
   </div>
-  <div id="navrow2" class="tabs2">
-    <ul class="tablist">
-      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
-      <li class="current"><a href="classes.html"><span>Class&#160;Index</span></a></li>
-      <li><a href="inherits.html"><span>Class&#160;Hierarchy</span></a></li>
-      <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
-    </ul>
-  </div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -81,28 +72,23 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+</div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">Class Index</div>  </div>
+<div class="title">Notes </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="qindex"><a class="qindex" href="#letter_C">C</a>&#160;|&#160;<a class="qindex" href="#letter_E">E</a>&#160;|&#160;<a class="qindex" href="#letter_H">H</a></div>
-<table style="margin: 10px; white-space: nowrap;" align="center" width="95%" border="0" cellspacing="0" cellpadding="0">
-<tr><td rowspan="2" valign="bottom"><a name="letter_C"></a><table border="0" cellspacing="0" cellpadding="0"><tr><td><div class="ah">&#160;&#160;C&#160;&#160;</div></td></tr></table>
-</td><td valign="top"><a class="el" href="classpython_1_1calibrationXML_1_1Crystal.html">Crystal</a> (python.calibrationXML)&#160;&#160;&#160;</td><td valign="top"><a class="el" href="classEcalTimingCalibProducer.html">EcalTimingCalibProducer</a>&#160;&#160;&#160;</td><td></td></tr>
-<tr><td rowspan="2" valign="bottom"><a name="letter_E"></a><table border="0" cellspacing="0" cellpadding="0"><tr><td><div class="ah">&#160;&#160;E&#160;&#160;</div></td></tr></table>
-</td><td valign="top"><a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</a>&#160;&#160;&#160;</td><td></td></tr>
-<tr><td valign="top"><a class="el" href="classpython_1_1calibrationXML_1_1CalibrationXML.html">CalibrationXML</a> (python.calibrationXML)&#160;&#160;&#160;</td><td rowspan="2" valign="bottom"><a name="letter_H"></a><table border="0" cellspacing="0" cellpadding="0"><tr><td><div class="ah">&#160;&#160;H&#160;&#160;</div></td></tr></table>
-</td><td></td></tr>
-<tr><td></td><td valign="top"><a class="el" href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a>&#160;&#160;&#160;</td><td></td></tr>
-<tr><td></td><td></td><td valign="top"><a class="el" href="classpython_1_1bintoy_1_1hist.html">hist</a> (python.bintoy)&#160;&#160;&#160;</td><td></td></tr>
-<tr><td></td><td></td><td></td><td></td></tr>
-</table>
-<div class="qindex"><a class="qindex" href="#letter_C">C</a>&#160;|&#160;<a class="qindex" href="#letter_E">E</a>&#160;|&#160;<a class="qindex" href="#letter_H">H</a></div>
-</div><!-- contents -->
+<div class="textblock"><p>Create a collection of compressed rechits, storing only the detid, energy and time. detid is a uint32_t Time is stored as a int16_t with a range of +/- 32.767 ns Energy is stored as a uint16_t with a max of 655.35 GeV so each hit is 8 bytes.</p>
+<p>Only hits with flags = 0 will be stored in the collection.</p>
+<p>The collection will be read in by the <a class="el" href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a> class which will perform the analysis</p>
+<p>The analysis will apply an energy threshold, calculate mean/stddev of timing, and recalculate the mean/stddev inside a 2 sigma window.</p>
+<p>TODO: Find out about ChiSquared for cutting on out of time pileup.</p>
+<p>If we notice that the output root file size is too large, we store a vector of time and energy per lumisection and store the detid only once per lumi.</p>
+<p>Go back to <a class="el" href="index.html">index</a> </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 18:38:50 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 19 2016 18:38:49 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
