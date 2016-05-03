@@ -79,13 +79,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>Download the code: </p>
-<pre class="fragment">scram project CMSSW_7_4_2
-cd CMSSW_7_4_2/src
+<pre class="fragment">scram project CMSSW_8_0_4
+cd CMSSW_8_0_4/src
 cmsenv
-git cms-merge-topic shervin86:iRingInSubdet
+git cms-merge-topic previsualconsent:iRingSebdet804
 git clone  git@github.com:previsualconsent/EcalTiming.git
 cd EcalTiming
-checkout energystability
+checkout Run2016
 scram b -j16
 </pre><p>Check if you have astyle command installed: </p>
 <pre class="fragment">which astyle
@@ -93,7 +93,7 @@ scram b -j16
 <p>Then add the following pre-commit hook into your GIT_DIR: </p>
 <pre class="fragment">cd $CMSSW_BASE/src/EcalTiming/
 if [ -d ".git/hooks" ];then
-  wget -O .git/hooks/pre-commit https://raw.githubusercontent.com/UMN-CMS/cms-WR/master/scripts/formatCode.sh
+   cp .gitprecommit .git/hooks/pre-commit
 else 
   echo "[ERROR] You are not in the main directory of this repository" &gt;&gt; /dev/stderr
 fi
@@ -102,7 +102,7 @@ cd -
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 19:36:02 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 3 2016 18:22:54 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

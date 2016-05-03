@@ -99,6 +99,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Inheritance diagram for EcalTimingCalibProducer:</div>
 <div class="dyncontent">
 <div class="center"><img src="classEcalTimingCalibProducer__inherit__graph.png" border="0" usemap="#EcalTimingCalibProducer_inherit__map" alt="Inheritance graph"/></div>
+<map name="EcalTimingCalibProducer_inherit__map" id="EcalTimingCalibProducer_inherit__map">
+</map>
 </div>
 <div class="dynheader">
 Collaboration diagram for EcalTimingCalibProducer:</div>
@@ -114,9 +116,9 @@ Private Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#ab4b89b77aab24a2217af5477172276dc">FillCalibrationCorrectionHists</a> (EcalTimeCalibrationMap::const_iterator cal_itr)</td></tr>
 <tr class="memdesc:ab4b89b77aab24a2217af5477172276dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">fill histograms with the measured shifts (that will become -corrections for the next step) <br/></td></tr>
 <tr class="separator:ab4b89b77aab24a2217af5477172276dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9be44de2534651c62b3677a3a280b33f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a9be44de2534651c62b3677a3a280b33f">addRecHit</a> (const EcalRecHit &amp;recHit, EventTimeMap &amp;eventTimeMap_)</td></tr>
-<tr class="memdesc:a9be44de2534651c62b3677a3a280b33f"><td class="mdescLeft">&#160;</td><td class="mdescRight">If recHit passes the selection it is added to the list of recHits to be used for calibration.  <a href="#a9be44de2534651c62b3677a3a280b33f">More...</a><br/></td></tr>
-<tr class="separator:a9be44de2534651c62b3677a3a280b33f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8e5a3ba909d8995bd097ae0c8aff9b47"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a8e5a3ba909d8995bd097ae0c8aff9b47">addRecHit</a> (const <a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;recHit, EventTimeMap &amp;eventTimeMap_)</td></tr>
+<tr class="memdesc:a8e5a3ba909d8995bd097ae0c8aff9b47"><td class="mdescLeft">&#160;</td><td class="mdescRight">If recHit passes the selection it is added to the list of recHits to be used for calibration.  <a href="#a8e5a3ba909d8995bd097ae0c8aff9b47">More...</a><br/></td></tr>
+<tr class="separator:a8e5a3ba909d8995bd097ae0c8aff9b47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2fc927678827cdb8f79a40583b55796e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a2fc927678827cdb8f79a40583b55796e">plotRecHit</a> (const <a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;recHit)</td></tr>
 <tr class="memdesc:a2fc927678827cdb8f79a40583b55796e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds the recHit to the per Event histograms.  <a href="#a2fc927678827cdb8f79a40583b55796e">More...</a><br/></td></tr>
 <tr class="separator:a2fc927678827cdb8f79a40583b55796e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -179,10 +181,6 @@ TProfile2D *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr><td colspan="2"><div class="groupHeader">Input Parameters</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Parameters defined in the config file _cfi,py </p>
 </div></td></tr>
-<tr class="memitem:ab295da7226dfc906ed35a76b1ea6e804"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab295da7226dfc906ed35a76b1ea6e804"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#ab295da7226dfc906ed35a76b1ea6e804">_maxLoop</a></td></tr>
-<tr class="memdesc:ab295da7226dfc906ed35a76b1ea6e804"><td class="mdescLeft">&#160;</td><td class="mdescRight">maximum number of loops for intercalibration <br/></td></tr>
-<tr class="separator:ab295da7226dfc906ed35a76b1ea6e804"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1b763f2f018e78a7a47fb2558d5c6020"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b763f2f018e78a7a47fb2558d5c6020"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a1b763f2f018e78a7a47fb2558d5c6020">_isSplash</a></td></tr>
 <tr class="memdesc:a1b763f2f018e78a7a47fb2558d5c6020"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag to activate for splash analysis <br/></td></tr>
@@ -191,18 +189,11 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a36c7a9434a4c80ffe82c0871a456c729">_makeEventPlots</a></td></tr>
 <tr class="memdesc:a36c7a9434a4c80ffe82c0871a456c729"><td class="mdescLeft">&#160;</td><td class="mdescRight">flag for making plots for each event (meant for splashes) <br/></td></tr>
 <tr class="separator:a36c7a9434a4c80ffe82c0871a456c729"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa3a579d643cfec41013df8fa310de48"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa3a579d643cfec41013df8fa310de48"></a>
-edm::InputTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#aaa3a579d643cfec41013df8fa310de48">_ecalRecHitsEBTAG</a></td></tr>
-<tr class="memdesc:aaa3a579d643cfec41013df8fa310de48"><td class="mdescLeft">&#160;</td><td class="mdescRight">input collection <br/></td></tr>
-<tr class="separator:aaa3a579d643cfec41013df8fa310de48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9266f08208a0d11b79e17d0fcf87c331"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9266f08208a0d11b79e17d0fcf87c331"></a>
-edm::InputTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a9266f08208a0d11b79e17d0fcf87c331">_ecalRecHitsEETAG</a></td></tr>
-<tr class="memdesc:a9266f08208a0d11b79e17d0fcf87c331"><td class="mdescLeft">&#160;</td><td class="mdescRight">input collection <br/></td></tr>
-<tr class="separator:a9266f08208a0d11b79e17d0fcf87c331"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72644e32accfbb2d58731eafeff46555"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72644e32accfbb2d58731eafeff46555"></a>
-std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a72644e32accfbb2d58731eafeff46555">_recHitFlags</a></td></tr>
-<tr class="memdesc:a72644e32accfbb2d58731eafeff46555"><td class="mdescLeft">&#160;</td><td class="mdescRight">vector containing list of valid rec hit flags for calibration <br/></td></tr>
-<tr class="separator:a72644e32accfbb2d58731eafeff46555"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dd0f1334fa51078a4e7271b362e04c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5dd0f1334fa51078a4e7271b362e04c2"></a>
+edm::EDGetTokenT<br class="typebreak"/>
+&lt; EcalTimingCollection &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a5dd0f1334fa51078a4e7271b362e04c2">_timingEvents</a></td></tr>
+<tr class="memdesc:a5dd0f1334fa51078a4e7271b362e04c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">input collection <br/></td></tr>
+<tr class="separator:a5dd0f1334fa51078a4e7271b362e04c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2cabd8a6b5efb0e7d445ca5c6412dba5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2cabd8a6b5efb0e7d445ca5c6412dba5"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a2cabd8a6b5efb0e7d445ca5c6412dba5">_recHitMin</a></td></tr>
 <tr class="memdesc:a2cabd8a6b5efb0e7d445ca5c6412dba5"><td class="mdescLeft">&#160;</td><td class="mdescRight">require at least this many rec hits to count the event <br/></td></tr>
@@ -223,12 +214,6 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a852a495056e76ca036505359a70d7b9c">_energyThresholdOffsetEE</a></td></tr>
 <tr class="memdesc:a852a495056e76ca036505359a70d7b9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">energy to add to the minimum energy thresholc <br/></td></tr>
 <tr class="separator:a852a495056e76ca036505359a70d7b9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad338e494b4bd31935c7e45b7dc457d5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad338e494b4bd31935c7e45b7dc457d5e"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_chi2ThresholdOffsetEB</b></td></tr>
-<tr class="separator:ad338e494b4bd31935c7e45b7dc457d5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12d970774f659935f6195ba6a5ee684e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a12d970774f659935f6195ba6a5ee684e"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>_chi2ThresholdOffsetEE</b></td></tr>
-<tr class="separator:a12d970774f659935f6195ba6a5ee684e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a80a17331986e6301c302b382bbbd5ed4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80a17331986e6301c302b382bbbd5ed4"></a>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classEcalTimingCalibProducer.html#a80a17331986e6301c302b382bbbd5ed4">_minEntries</a></td></tr>
 <tr class="memdesc:a80a17331986e6301c302b382bbbd5ed4"><td class="mdescLeft">&#160;</td><td class="mdescRight">require a minimum number of entries in a ring to do averages <br/></td></tr>
@@ -256,7 +241,7 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
 <div class="textblock"><p>This plugin runs over the events, selects the recHits according to the criteria defined in addRecHit</p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>Exit condition based on convergence</dd></dl>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a9be44de2534651c62b3677a3a280b33f"></a>
+<a class="anchor" id="a8e5a3ba909d8995bd097ae0c8aff9b47"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -266,7 +251,7 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
         <tr>
           <td class="memname">bool EcalTimingCalibProducer::addRecHit </td>
           <td>(</td>
-          <td class="paramtype">const EcalRecHit &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;&#160;</td>
           <td class="paramname"><em>recHit</em>, </td>
         </tr>
         <tr>
@@ -295,7 +280,16 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
 <li>at each iteration the recHit threshold is raised by _minRecHitEnergyStep If the recHit is used, the time information is added to _eventTimeMap </li>
 </ul>
 
-<p>References <a class="el" href="classEcalTimingCalibProducer.html#a32729c694cf3def06f10528ae9f78618">_eventTimeMap</a>, and <a class="el" href="classEcalTimingCalibProducer.html#a72644e32accfbb2d58731eafeff46555">_recHitFlags</a>.</p>
+<p>References <a class="el" href="classEcalTimingCalibProducer.html#a32729c694cf3def06f10528ae9f78618">_eventTimeMap</a>, and <a class="el" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">EcalTimingEvent::energy()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classEcalTimingCalibProducer_a8e5a3ba909d8995bd097ae0c8aff9b47_cgraph.png" border="0" usemap="#classEcalTimingCalibProducer_a8e5a3ba909d8995bd097ae0c8aff9b47_cgraph" alt=""/></div>
+<map name="classEcalTimingCalibProducer_a8e5a3ba909d8995bd097ae0c8aff9b47_cgraph" id="classEcalTimingCalibProducer_a8e5a3ba909d8995bd097ae0c8aff9b47_cgraph">
+</map>
+</div>
+</p>
 
 </div>
 </div>
@@ -347,7 +341,16 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
   </dd>
 </dl>
 
-<p>References <a class="el" href="classEcalTimingCalibProducer.html#a7a8b42d286ad6306adf60edd625d353c">_globalOffset</a>.</p>
+<p>References <a class="el" href="classEcalTimingCalibProducer.html#a7a8b42d286ad6306adf60edd625d353c">_globalOffset</a>, <a class="el" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">EcalTimingEvent::energy()</a>, and <a class="el" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">EcalTimingEvent::time()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classEcalTimingCalibProducer_a9585855714676ec55838e9ddaa7b9250_cgraph.png" border="0" usemap="#classEcalTimingCalibProducer_a9585855714676ec55838e9ddaa7b9250_cgraph" alt=""/></div>
+<map name="classEcalTimingCalibProducer_a9585855714676ec55838e9ddaa7b9250_cgraph" id="classEcalTimingCalibProducer_a9585855714676ec55838e9ddaa7b9250_cgraph">
+</map>
+</div>
+</p>
 
 </div>
 </div>
@@ -362,7 +365,7 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
           <td class="memname">void EcalTimingCalibProducer::plotRecHit </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;&#160;</td>
-          <td class="paramname"><em>recHit</em></td><td>)</td>
+          <td class="paramname"><em>timeEvent</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -373,6 +376,17 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
 </table>
 </div><div class="memdoc">
 <p>fills the energy map and timing maps for EB, EE+ and EE- </p>
+
+<p>References <a class="el" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">EcalTimingEvent::energy()</a>, and <a class="el" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">EcalTimingEvent::time()</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classEcalTimingCalibProducer_a2fc927678827cdb8f79a40583b55796e_cgraph.png" border="0" usemap="#classEcalTimingCalibProducer_a2fc927678827cdb8f79a40583b55796e_cgraph" alt=""/></div>
+<map name="classEcalTimingCalibProducer_a2fc927678827cdb8f79a40583b55796e_cgraph" id="classEcalTimingCalibProducer_a2fc927678827cdb8f79a40583b55796e_cgraph">
+</map>
+</div>
+</p>
 
 </div>
 </div>
@@ -405,7 +419,7 @@ float&#160;</td><td class="memItemRight" valign="bottom"><b>_maxSkewnessForDump<
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 19:36:03 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 3 2016 18:22:55 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

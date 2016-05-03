@@ -1,0 +1,8 @@
+digraph "Graphical Class Hierarchy"
+{
+ // INTERACTIVE_SVG=YES
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="python.calibrationXML.CalibrationXML",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classpython_1_1calibrationXML_1_1CalibrationXML.html"];
+}

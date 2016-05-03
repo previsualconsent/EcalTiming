@@ -1,0 +1,9 @@
+digraph "EcalTimingCalibProducer"
+{
+ // INTERACTIVE_SVG=YES
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="{EcalTimingCalibProducer\n|- _timeCalibMap\l- _eventTimeMap\l- _HWCalibrationMap\l- timeEEP\l- timeEEM\l- timeEB\l- timeEBRing\l- timeEEmRing\l- timeEEpRing\l- timeEBCRYex\land 46 more...\l- _isSplash\l- _makeEventPlots\l- _timingEvents\l- _recHitMin\l- _minRecHitEnergyStep\l- _minRecHitEnergyNStep\l- _energyThresholdOffsetEB\l- _energyThresholdOffsetEE\l- _minEntries\l- _globalOffset\l- _storeEvents\l- _produceNewCalib\l- _outputDumpFileName\l- _maxSkewnessForDump\l|+ EcalTimingCalibProducer()\l+ ~EcalTimingCalibProducer()\l+ beginJob()\l+ filter()\l+ endJob()\l- dumpCalibration()\l- dumpCorrections()\l- FillCalibrationCorrection\lHists()\l- FillHWCorrectionHists()\l- FillEnergyStabilityHists()\l- initHists()\l- initEventHists()\l- initTree()\l- addRecHit()\l- plotRecHit()\l- correctGlobalOffset()\l- getElecID()\l- getEnergyThreshold()\l* _isSplash\l* _makeEventPlots\l* _timingEvents\l* _recHitMin\l* _minRecHitEnergyStep\l* _minRecHitEnergyNStep\l* _energyThresholdOffsetEB\l* _energyThresholdOffsetEE\l* _minEntries\l* _globalOffset\l* _storeEvents\l* _produceNewCalib\l* _outputDumpFileName\l* _maxSkewnessForDump\l}",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node2 -> Node1 [dir="back",color="midnightblue",fontsize="10",style="solid",arrowtail="onormal",fontname="Helvetica"];
+  Node2 [label="{edm::EDFilter\n||}",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled"];
+}

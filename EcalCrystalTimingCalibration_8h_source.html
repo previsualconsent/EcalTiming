@@ -211,144 +211,143 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="classEcalCrystalTimingCalibration.html#a548ddfab5eb9db34d910286186b3daca">  122</a></span>&#160;<span class="comment"></span>    <span class="keywordtype">bool</span> <a class="code" href="classEcalCrystalTimingCalibration.html#a548ddfab5eb9db34d910286186b3daca">insertEvent</a>(<a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a> te_, <span class="keywordtype">bool</span> storeEvent)</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    {</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;        <span class="keywordflow">if</span>(!storeEvent) _storingEvents = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        <span class="keywordflow">if</span>(te_.timeError() &gt; 0 &amp;&amp; te_.timeError() &lt; 1000 &amp;&amp; te_.timeError() &lt; 3) { <span class="comment">//exclude values with wrong timeError estimation</span></div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;            <a class="code" href="classEcalCrystalTimingCalibration.html#a692a4fa9497ac4994d3a48d7c97123df">_sum</a> += te_.time();</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;            <a class="code" href="classEcalCrystalTimingCalibration.html#a428e230828ca81e1913eaaf528ec3df0">_sum2</a> += te_.time() * te_.time();</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;            <a class="code" href="classEcalCrystalTimingCalibration.html#acbd807baa21279c5110b07f0fa6b1564">_sumE</a> += te_.energy();</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;            <a class="code" href="classEcalCrystalTimingCalibration.html#a4c6c78dd2783681fec6a8fb3467087fd">_num</a>++;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;            <span class="keywordflow">if</span>(_storingEvents)</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;                <a class="code" href="classEcalCrystalTimingCalibration.html#a80abd6aac5be2aa977e06132b5c0ede1">timingEvents</a>.push_back(te_);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;            <span class="comment">//updateChi2();</span></div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;        }</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    }</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">/* int filterOutliers(float threshold = 0.5) */</span></div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">/*  int numPointsErased = 0; */</span></div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="comment">/*  while(timingEvents.size() &gt; 4) { */</span></div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">/*      updateChi2(); */</span></div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="comment">/*      float oldMean = mean; */</span></div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">/*      // Erase largest chi2 event */</span></div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">/*      EcalTimingEvent toRemove = *maxChi2Itr; */</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">/*      timingEvents.erase(maxChi2Itr); */</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">/*      //Calculate new mean/error */</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="comment">/*      updateChi2(); */</span></div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">/*      //Compare to old mean and break if |(newMean-oldMean)| &lt; newSigma */</span></div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">/*      //TODO: study acceptance threshold */</span></div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="comment">/*      if(fabs(mean - oldMean) &lt; threshold * meanE) { */</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">/*          insertEvent(toRemove); */</span></div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="comment">/*          break; */</span></div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="comment">/*      } else { */</span></div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="comment">/*          numPointsErased++; */</span></div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">/*      } */</span></div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="comment">/*  return numPointsErased; */</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="comment">/* bool useWeightedMean; */</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">/* //calculate chi2: assume a gaussian distribution */</span></div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">/* void updateChi2() // update individual, total, maxChi2s */</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">/*  if(useWeightedMean) { */</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">/*      updateChi2Weighted(); */</span></div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">/*  } else { */</span></div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">/*      updateChi2Unweighted(); */</span></div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">/* void updateChi2Weighted() */</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">/*  updateMeanWeighted(); */</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">/*  float chi2 = 0; */</span></div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="comment">/*  maxChi2Itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::iterator itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">/*      float singleChi = (itr-&gt;time - mean) / itr-&gt;sigmaTime; */</span></div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">/*      itr-&gt;chi2 = singleChi * singleChi; */</span></div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="comment">/*      chi2 += singleChi * singleChi; */</span></div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="comment">/*      if(itr-&gt;chi2 &gt; maxChi2Itr-&gt;chi2) { */</span></div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">/*          maxChi2Itr = itr; */</span></div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">/*      } */</span></div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">/*  totalChi2 = chi2; */</span></div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="comment">/* void updateChi2Unweighted() */</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">/*  updateMeanUnweighted(); */</span></div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="comment">/*  float chi2 = 0; */</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="comment">/*  maxChi2Itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::iterator itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">/*      float singleChi = (itr-&gt;time - mean); */</span></div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">/*      itr-&gt;chi2 = singleChi * singleChi; */</span></div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="comment">/*      chi2 += singleChi * singleChi; */</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="comment">/*      if(itr-&gt;chi2 &gt; maxChi2Itr-&gt;chi2) { */</span></div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">/*          maxChi2Itr = itr; */</span></div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">/*      } */</span></div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">/*  totalChi2 = chi2; */</span></div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="comment">/* void updateMeanWeighted() */</span></div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="comment">/*  float meanTmp = 0; */</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="comment">/*  float mean2Tmp = 0; */</span></div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="comment">/*  float sigmaTmp = 0; */</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::const_iterator itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">/*      float sigmaT2 = itr-&gt;sigmaTime; */</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">/*      sigmaT2 *= sigmaT2; */</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">/*      sigmaTmp += 1 / (sigmaT2); */</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">/*      meanTmp += (itr-&gt;time) / (sigmaT2); */</span></div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">/*      mean2Tmp += ((itr-&gt;time) * (itr-&gt;time)) / (sigmaT2); */</span></div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">/*  meanE = sqrt(1 / sigmaTmp); */</span></div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">/*  mean = meanTmp / sigmaTmp; */</span></div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="comment">/*  rms = sqrt(mean2Tmp / sigmaTmp); */</span></div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="comment">/*  stdDev = sqrt(rms * rms - mean * mean); */</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="comment">/* void updateMeanUnweighted() */</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">/* { */</span></div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">/*  float meanTmp = 0; */</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="comment">/*  float mean2Tmp = 0; */</span></div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::const_iterator itr = timingEvents.begin(); */</span></div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">/*      meanTmp += itr-&gt;time; */</span></div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">/*      mean2Tmp += (itr-&gt;time) * (itr-&gt;time); */</span></div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="comment">/*  } */</span></div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">/*  mean = meanTmp / timingEvents.size(); */</span></div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">/*  rms = sqrt(mean2Tmp / timingEvents.size()); */</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">/*  stdDev = sqrt(rms * rms - mean * mean); */</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="comment">/*  meanE = stdDev / sqrt(timingEvents.size()); // stdDev/sqrt(n) */</span></div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">/* } */</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;};</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;                <span class="comment">//exclude values with wrong timeError estimation</span></div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <span class="comment">//if(!(te_.timeError() &gt; 0 &amp;&amp; te_.timeError() &lt; 1000 &amp;&amp; te_.timeError() &lt; 3)) </span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;                <span class="comment">//   return false;</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;                <a class="code" href="classEcalCrystalTimingCalibration.html#a692a4fa9497ac4994d3a48d7c97123df">_sum</a> += te_.<a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>();</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;                <a class="code" href="classEcalCrystalTimingCalibration.html#a428e230828ca81e1913eaaf528ec3df0">_sum2</a> += te_.<a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>() * te_.<a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>();</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;                <a class="code" href="classEcalCrystalTimingCalibration.html#acbd807baa21279c5110b07f0fa6b1564">_sumE</a> += te_.<a class="code" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">energy</a>();</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;                <a class="code" href="classEcalCrystalTimingCalibration.html#a4c6c78dd2783681fec6a8fb3467087fd">_num</a>++;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;                <span class="keywordflow">if</span>(_storingEvents)</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;                   <a class="code" href="classEcalCrystalTimingCalibration.html#a80abd6aac5be2aa977e06132b5c0ede1">timingEvents</a>.push_back(te_);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;                <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    }</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="comment">/* int filterOutliers(float threshold = 0.5) */</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="comment">/*  int numPointsErased = 0; */</span></div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="comment">/*  while(timingEvents.size() &gt; 4) { */</span></div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    <span class="comment">/*      updateChi2(); */</span></div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="comment">/*      float oldMean = mean; */</span></div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="comment">/*      // Erase largest chi2 event */</span></div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="comment">/*      EcalTimingEvent toRemove = *maxChi2Itr; */</span></div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">/*      timingEvents.erase(maxChi2Itr); */</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">/*      //Calculate new mean/error */</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">/*      updateChi2(); */</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="comment">/*      //Compare to old mean and break if |(newMean-oldMean)| &lt; newSigma */</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="comment">/*      //TODO: study acceptance threshold */</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="comment">/*      if(fabs(mean - oldMean) &lt; threshold * meanE) { */</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="comment">/*          insertEvent(toRemove); */</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="comment">/*          break; */</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="comment">/*      } else { */</span></div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="comment">/*          numPointsErased++; */</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="comment">/*      } */</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    <span class="comment">/*  return numPointsErased; */</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">/* bool useWeightedMean; */</span></div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="comment">/* //calculate chi2: assume a gaussian distribution */</span></div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    <span class="comment">/* void updateChi2() // update individual, total, maxChi2s */</span></div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="comment">/*  if(useWeightedMean) { */</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="comment">/*      updateChi2Weighted(); */</span></div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="comment">/*  } else { */</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="comment">/*      updateChi2Unweighted(); */</span></div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="comment">/* void updateChi2Weighted() */</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="comment">/*  updateMeanWeighted(); */</span></div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="comment">/*  float chi2 = 0; */</span></div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="comment">/*  maxChi2Itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::iterator itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="comment">/*      float singleChi = (itr-&gt;time - mean) / itr-&gt;sigmaTime; */</span></div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="comment">/*      itr-&gt;chi2 = singleChi * singleChi; */</span></div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="comment">/*      chi2 += singleChi * singleChi; */</span></div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="comment">/*      if(itr-&gt;chi2 &gt; maxChi2Itr-&gt;chi2) { */</span></div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="comment">/*          maxChi2Itr = itr; */</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    <span class="comment">/*      } */</span></div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">/*  totalChi2 = chi2; */</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="comment">/* void updateChi2Unweighted() */</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">/*  updateMeanUnweighted(); */</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">/*  float chi2 = 0; */</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    <span class="comment">/*  maxChi2Itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::iterator itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="comment">/*      float singleChi = (itr-&gt;time - mean); */</span></div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="comment">/*      itr-&gt;chi2 = singleChi * singleChi; */</span></div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="comment">/*      chi2 += singleChi * singleChi; */</span></div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="comment">/*      if(itr-&gt;chi2 &gt; maxChi2Itr-&gt;chi2) { */</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="comment">/*          maxChi2Itr = itr; */</span></div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;    <span class="comment">/*      } */</span></div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="comment">/*  totalChi2 = chi2; */</span></div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="comment">/* void updateMeanWeighted() */</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="comment">/*  float meanTmp = 0; */</span></div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="comment">/*  float mean2Tmp = 0; */</span></div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="comment">/*  float sigmaTmp = 0; */</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::const_iterator itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="comment">/*      float sigmaT2 = itr-&gt;sigmaTime; */</span></div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">/*      sigmaT2 *= sigmaT2; */</span></div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">/*      sigmaTmp += 1 / (sigmaT2); */</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">/*      meanTmp += (itr-&gt;time) / (sigmaT2); */</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">/*      mean2Tmp += ((itr-&gt;time) * (itr-&gt;time)) / (sigmaT2); */</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="comment">/*  meanE = sqrt(1 / sigmaTmp); */</span></div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    <span class="comment">/*  mean = meanTmp / sigmaTmp; */</span></div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    <span class="comment">/*  rms = sqrt(mean2Tmp / sigmaTmp); */</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    <span class="comment">/*  stdDev = sqrt(rms * rms - mean * mean); */</span></div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="comment">/* void updateMeanUnweighted() */</span></div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="comment">/* { */</span></div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    <span class="comment">/*  float meanTmp = 0; */</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">/*  float mean2Tmp = 0; */</span></div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <span class="comment">/*  for(std::vector&lt;EcalTimingEvent&gt;::const_iterator itr = timingEvents.begin(); */</span></div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="comment">/*          itr != timingEvents.end(); ++itr) { */</span></div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="comment">/*      meanTmp += itr-&gt;time; */</span></div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="comment">/*      mean2Tmp += (itr-&gt;time) * (itr-&gt;time); */</span></div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="comment">/*  } */</span></div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="comment">/*  mean = meanTmp / timingEvents.size(); */</span></div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="comment">/*  rms = sqrt(mean2Tmp / timingEvents.size()); */</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="comment">/*  stdDev = sqrt(rms * rms - mean * mean); */</span></div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="comment">/*  meanE = stdDev / sqrt(timingEvents.size()); // stdDev/sqrt(n) */</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="comment">/* } */</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;};</div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a5b5b1df8a43ba47e838375fd917aa3b5"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a5b5b1df8a43ba47e838375fd917aa3b5">EcalCrystalTimingCalibration::calcAllWithinNSigma</a></div><div class="ttdeci">void calcAllWithinNSigma(float n_sigma, float maxRange=10) const </div><div class="ttdoc">calculate sum, sum2, sum3, n for time if time within n x stdDev and store the result ...</div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:43</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a5d8678a7867daf8f04fc43e8dab14d48"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a5d8678a7867daf8f04fc43e8dab14d48">EcalCrystalTimingCalibration::getMeanWithinNSigma</a></div><div class="ttdeci">float getMeanWithinNSigma(float sigma, float maxRange) const </div><div class="ttdoc">average Energy (mean of the Energy distribution) </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:11</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a671ef53e6c0de14b16a44680ca12a728"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a671ef53e6c0de14b16a44680ca12a728">EcalCrystalTimingCalibration::isStableInEnergy</a></div><div class="ttdeci">bool isStableInEnergy(float min, float max, float step, std::vector&lt; std::pair&lt; float, EcalCrystalTimingCalibration * &gt; &gt; &amp;ret)</div><div class="ttdoc">checks if the time measurement is stable changing the min energy threshold </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:76</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a44386682df794585ea600b9eb07ac23a"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a44386682df794585ea600b9eb07ac23a">EcalCrystalTimingCalibration::getNumWithinNSigma</a></div><div class="ttdeci">float getNumWithinNSigma(float sigma, float maxRange) const </div><div class="ttdoc">returns the num calculated within abs(mean+ n * stdDev) to reject tails </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:4</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_add88493a3fe8656b76d1b22374ac0b80"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#add88493a3fe8656b76d1b22374ac0b80">EcalCrystalTimingCalibration::getStdDevWithinNSigma</a></div><div class="ttdeci">float getStdDevWithinNSigma(float sigma, float maxRange) const </div><div class="ttdoc">returns the stdDev calculated within abs(mean+ n * stdDev) to reject tails </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:18</div></div>
-<div class="ttc" id="classEcalTimingEvent_html"><div class="ttname"><a href="classEcalTimingEvent.html">EcalTimingEvent</a></div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:13</div></div>
+<div class="ttc" id="classEcalTimingEvent_html"><div class="ttname"><a href="classEcalTimingEvent.html">EcalTimingEvent</a></div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:16</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_aff87eadab77c333c3830c5ef89e4321a"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#aff87eadab77c333c3830c5ef89e4321a">EcalCrystalTimingCalibration::EcalCrystalTimingCalibration</a></div><div class="ttdeci">EcalCrystalTimingCalibration(bool weightMean=true)</div><div class="ttdoc">default constructor </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:44</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_acbd807baa21279c5110b07f0fa6b1564"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#acbd807baa21279c5110b07f0fa6b1564">EcalCrystalTimingCalibration::_sumE</a></div><div class="ttdeci">float _sumE</div><div class="ttdoc">scalar sum of the energy of each timingEvent: needed for average energy </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:31</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_ab9bcb2df3ca3163b5e667422339722fa"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#ab9bcb2df3ca3163b5e667422339722fa">EcalCrystalTimingCalibration::dumpCalibToTree</a></div><div class="ttdeci">void dumpCalibToTree(TTree *tree, int rawid_, int ix_, int iy_, int iz_, unsigned int elecID_, int iRing_) const </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:116</div></div>
@@ -356,6 +355,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_abb70e1e09eb7bef5b22926b4f13d21c7"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#abb70e1e09eb7bef5b22926b4f13d21c7">EcalCrystalTimingCalibration::getSkewnessWithinNSigma</a></div><div class="ttdeci">float getSkewnessWithinNSigma(float sigma, float maxRange) const </div><div class="ttdoc">returns the skewness calculated within abs(mean+ n * stdDev) to reject tails </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.cc:32</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a80abd6aac5be2aa977e06132b5c0ede1"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a80abd6aac5be2aa977e06132b5c0ede1">EcalCrystalTimingCalibration::timingEvents</a></div><div class="ttdeci">std::vector&lt; EcalTimingEvent &gt; timingEvents</div><div class="ttdoc">vector containing all the events for this crystal </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:38</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_ae09be65773c91c35e322cef020b3dd50"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#ae09be65773c91c35e322cef020b3dd50">EcalCrystalTimingCalibration::_sumEWithinNSigma</a></div><div class="ttdeci">std::map&lt; float, float &gt; _sumEWithinNSigma</div><div class="ttdoc">variables for calculation of mean, stdDev within n-times the origina stdDev (to remove tails) ...</div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:34</div></div>
+<div class="ttc" id="classEcalTimingEvent_html_afeb64d2b6b36933d4ae67f7e4a8ff909"><div class="ttname"><a href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">EcalTimingEvent::time</a></div><div class="ttdeci">float time() const </div><div class="ttdoc">Time is stored in a int16_t in ps. time() returns a float in ns. </div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:37</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a5b621db46700b80fc852fd2907e16631"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a5b621db46700b80fc852fd2907e16631">EcalCrystalTimingCalibration::add</a></div><div class="ttdeci">bool add(EcalTimingEvent te_, bool storeEvent=true)</div><div class="ttdoc">add new event for this crystal </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:94</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a6a0685fed9b017364a5806e08cf656d4"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a6a0685fed9b017364a5806e08cf656d4">EcalCrystalTimingCalibration::stdDev</a></div><div class="ttdeci">float stdDev() const </div><div class="ttdoc">average time (mean of the time distribution) </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:61</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html">EcalCrystalTimingCalibration</a></div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:19</div></div>
@@ -364,11 +364,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a4c6c78dd2783681fec6a8fb3467087fd"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a4c6c78dd2783681fec6a8fb3467087fd">EcalCrystalTimingCalibration::_num</a></div><div class="ttdeci">unsigned long int _num</div><div class="ttdoc">number of timingEvents; </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:29</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a692a4fa9497ac4994d3a48d7c97123df"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a692a4fa9497ac4994d3a48d7c97123df">EcalCrystalTimingCalibration::_sum</a></div><div class="ttdeci">float _sum</div><div class="ttdoc">scalar sum of the time of each timingEvent </div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:27</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_aaa243edf939bf28c34ffca77bd7ab155"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#aaa243edf939bf28c34ffca77bd7ab155">EcalCrystalTimingCalibration::_numWithinNSigma</a></div><div class="ttdeci">std::map&lt; float, unsigned int &gt; _numWithinNSigma</div><div class="ttdoc">variables for calculation of mean, stdDev within n-times the origina stdDev (to remove tails) ...</div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:35</div></div>
+<div class="ttc" id="classEcalTimingEvent_html_a7d941a971b60c6a063bc1492115206ab"><div class="ttname"><a href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">EcalTimingEvent::energy</a></div><div class="ttdeci">float energy() const </div><div class="ttdoc">Energy is stored in a uint16_t in 10&amp;#39;s of MeV. energy() returns a float in GeV. </div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:39</div></div>
 <div class="ttc" id="classEcalCrystalTimingCalibration_html_a548ddfab5eb9db34d910286186b3daca"><div class="ttname"><a href="classEcalCrystalTimingCalibration.html#a548ddfab5eb9db34d910286186b3daca">EcalCrystalTimingCalibration::insertEvent</a></div><div class="ttdeci">bool insertEvent(EcalTimingEvent te_, bool storeEvent)</div><div class="ttdef"><b>Definition:</b> EcalCrystalTimingCalibration.h:122</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 19:36:02 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 3 2016 18:22:54 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

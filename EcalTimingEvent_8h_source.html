@@ -99,54 +99,82 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="comment"> * Description: basic timing information</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classEcalTimingEvent.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a> : <span class="keyword">public</span> EcalRecHit</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"></span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">    ///copy constructor</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno"><a class="line" href="classEcalTimingEvent.html#af3383934c1981a829af56d8c8c3f3777">   18</a></span>&#160;<span class="comment"></span>    <a class="code" href="classEcalTimingEvent.html#af3383934c1981a829af56d8c8c3f3777">EcalTimingEvent</a>(<span class="keyword">const</span> EcalRecHit&amp; rec): EcalRecHit(rec) {};</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;    <span class="comment">/* EcalRecHit(rec.detid(), rec.energy(), rec.time(), 0, 0){ */</span></div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;    <span class="comment">/*      setChi2(rec.chi2()); */</span></div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;    <span class="comment">/*      setEnergyError(rec.energyError()); */</span></div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;    <span class="comment">/*      uint32_t timeErrorBits = getMasked(extra_, 24, 8); */</span></div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;    <span class="comment">/*      extra_ = setMasked(rec.extra_, timeErrBits &amp; 0xFF, 24, 8); */</span></div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <span class="keyword">friend</span> std::ostream&amp; operator &lt;&lt; (std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a>&amp; event)</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    {</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;        <span class="keywordflow">if</span>(event.detid().subdetId() == EcalBarrel) {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;            EBDetId id(event.detid());</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;            os  &lt;&lt; <span class="keywordtype">id</span>.ieta() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.iphi() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.zside() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;        } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;            EEDetId id(event.detid());</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;            os &lt;&lt; <span class="keywordtype">id</span>.ix() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.iy() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.zside() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;        }</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;        os &lt;&lt; <span class="keyword">event</span>.time() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keyword">event</span>.timeError() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keyword">event</span>.energy();</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;        <span class="keywordflow">return</span> os;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    }</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">bool</span> operator== (<span class="keyword">const</span> <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;first)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">    </span>{</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="comment">// only check amp, time, sigmaT</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">if</span> (first.energy() == this-&gt;energy() &amp;&amp;</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;                first.time() == this-&gt;time() &amp;&amp;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;                first.timeError() == this-&gt;timeError()) {</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        }</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    }</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;};</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="preprocessor"></span></div>
-<div class="ttc" id="classEcalTimingEvent_html_af3383934c1981a829af56d8c8c3f3777"><div class="ttname"><a href="classEcalTimingEvent.html#af3383934c1981a829af56d8c8c3f3777">EcalTimingEvent::EcalTimingEvent</a></div><div class="ttdeci">EcalTimingEvent(const EcalRecHit &amp;rec)</div><div class="ttdoc">copy constructor </div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:18</div></div>
-<div class="ttc" id="classEcalTimingEvent_html"><div class="ttname"><a href="classEcalTimingEvent.html">EcalTimingEvent</a></div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:13</div></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#define MAX_TIME 32.767</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor"></span><span class="preprocessor">#define MAX_ENERGY 655.35</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor"></span></div>
+<div class="line"><a name="l00016"></a><span class="lineno"><a class="line" href="classEcalTimingEvent.html">   16</a></span>&#160;<span class="keyword">class </span><a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;{</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;        <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a>()</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;        {</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;           detid_ = DetId(0);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;           setTime(MAX_TIME);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;           setEnergy(MAX_ENERGY);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;        }</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;    <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a>(DetId <span class="keywordtype">id</span>) {</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;           detid_ = id;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;           setTime(MAX_TIME);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;           setEnergy(MAX_ENERGY);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;        }</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a>(<span class="keyword">const</span> EcalRecHit&amp; rec) {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;           detid_ = rec.detid();</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;           setTime(rec.time());</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;           setEnergy(rec.energy());</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;        }</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="comment"></span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">        /// Time is stored in a int16_t in ps. time() returns a float in ns</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">   37</a></span>&#160;<span class="comment"></span>        <span class="keywordtype">float</span> <a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>()<span class="keyword"> const</span>{ <span class="keywordflow">return</span> float(time_)/1000.0f; }<span class="comment"></span></div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="comment">        /// Energy is stored in a uint16_t in 10&#39;s of MeV. energy() returns a float in GeV</span></div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">   39</a></span>&#160;<span class="comment"></span>        <span class="keywordtype">float</span> <a class="code" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">energy</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> float(energy_)/100.0f; }</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="keyword">const</span> DetId&amp; detid()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> detid_; }</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordtype">void</span> setTime(<span class="keywordtype">float</span> t);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordtype">void</span> setEnergy(<span class="keywordtype">float</span> e);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        DetId detid_;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        int16_t time_;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        uint16_t energy_;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">friend</span> std::ostream&amp; operator &lt;&lt; (std::ostream&amp; os, <span class="keyword">const</span> <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a>&amp; event)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="keywordflow">if</span>(event.detid().subdetId() == EcalBarrel) {</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            EBDetId id(event.detid());</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            os  &lt;&lt; <span class="keywordtype">id</span>.ieta() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.iphi() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.zside() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;            EEDetId id(event.detid());</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;            os &lt;&lt; <span class="keywordtype">id</span>.ix() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.iy() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keywordtype">id</span>.zside() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span>;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        os &lt;&lt; <span class="keyword">event</span>.time() &lt;&lt; <span class="stringliteral">&quot;\t&quot;</span> &lt;&lt; <span class="keyword">event</span>.energy();</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        <span class="keywordflow">return</span> os;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    }</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">bool</span> operator== (<span class="keyword">const</span> <a class="code" href="classEcalTimingEvent.html">EcalTimingEvent</a> &amp;first)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">    </span>{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        <span class="comment">// only check amp, time, sigmaT</span></div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        <span class="keywordflow">if</span> (first.<a class="code" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">energy</a>() == this-&gt;<a class="code" href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">energy</a>() &amp;&amp;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;                first.<a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>() == this-&gt;<a class="code" href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">time</a>())</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;                {</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    }</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;};</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">typedef</span> std::vector&lt;EcalTimingEvent&gt; EcalTimingCollection;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="preprocessor"></span></div>
+<div class="ttc" id="classEcalTimingEvent_html"><div class="ttname"><a href="classEcalTimingEvent.html">EcalTimingEvent</a></div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:16</div></div>
+<div class="ttc" id="classEcalTimingEvent_html_afeb64d2b6b36933d4ae67f7e4a8ff909"><div class="ttname"><a href="classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909">EcalTimingEvent::time</a></div><div class="ttdeci">float time() const </div><div class="ttdoc">Time is stored in a int16_t in ps. time() returns a float in ns. </div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:37</div></div>
+<div class="ttc" id="classEcalTimingEvent_html_a7d941a971b60c6a063bc1492115206ab"><div class="ttname"><a href="classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab">EcalTimingEvent::energy</a></div><div class="ttdeci">float energy() const </div><div class="ttdoc">Energy is stored in a uint16_t in 10&amp;#39;s of MeV. energy() returns a float in GeV. </div><div class="ttdef"><b>Definition:</b> EcalTimingEvent.h:39</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 19 2016 19:36:02 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 3 2016 18:22:54 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

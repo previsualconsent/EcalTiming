@@ -1,0 +1,12 @@
+digraph "EcalCrystalTimingCalibration::insertEvent"
+{
+ // INTERACTIVE_SVG=YES
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="EcalCrystalTimingCalibration\l::insertEvent",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled" fontcolor="black"];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="EcalTimingEvent::energy",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classEcalTimingEvent.html#a7d941a971b60c6a063bc1492115206ab",tooltip="Energy is stored in a uint16_t in 10&#39;s of MeV. energy() returns a float in GeV. "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="EcalTimingEvent::time",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classEcalTimingEvent.html#afeb64d2b6b36933d4ae67f7e4a8ff909",tooltip="Time is stored in a int16_t in ps. time() returns a float in ns. "];
+}
