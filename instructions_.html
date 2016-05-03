@@ -82,10 +82,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <pre class="fragment">scram project CMSSW_8_0_4
 cd CMSSW_8_0_4/src
 cmsenv
-git cms-merge-topic previsualconsent:iRingSebdet804
+git cms-merge-topic previsualconsent:iRingSubdet804
 git clone  git@github.com:previsualconsent/EcalTiming.git
 cd EcalTiming
-checkout Run2016
+git checkout Run2016
+cd - 
 scram b -j16
 </pre><p>Check if you have astyle command installed: </p>
 <pre class="fragment">which astyle
@@ -102,7 +103,7 @@ cd -
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 3 2016 18:22:54 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 3 2016 18:35:09 for EcalTiming by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>
