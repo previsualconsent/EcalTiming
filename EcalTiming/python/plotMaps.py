@@ -320,18 +320,21 @@ if __name__ == "__main__":
 	customROOTstyle()
 	ROOT.gROOT.SetBatch(True)
 	print sys.argv
-	filename = sys.argv[1]
-	prefix = sys.argv[2]
+	prefix = sys.argv[1]
+	filename = sys.argv[2]
 
-	#if len(sys.argv) > 1:
-	#	outdir = sys.argv[1]
-	#elif filename.startswith("output"):
-		# use same path as input file with output -> plots
-	dir, basename = os.path.split(filename)
-	dir = dir.split('/')
-	print dir[-1:]
-	outdir = '/'.join(dir[:-1]) + "/plots/" + dir[-1]
-	outdir = os.path.normpath(outdir)
+	if len(sys.argv) == 3:
+		#if len(sys.argv) > 1:
+		#	outdir = sys.argv[1]
+		#elif filename.startswith("output"):
+			# use same path as input file with output -> plots
+		dir, basename = os.path.split(filename)
+		dir = dir.split('/')
+		print dir[-1:]
+		outdir = '/'.join(dir[:-1]) + "/plots/" + dir[-1]
+		outdir = os.path.normpath(outdir)
+	elif len(sys.argv) == 4:
+		outdir = sys.argv[3]
 
 	def mkdir_p(path):
 		try:
@@ -342,7 +345,7 @@ if __name__ == "__main__":
 			else: raise
 
 	mkdir_p(outdir)
-	#shutil.copy("plots/index.php", outdir)
+	shutil.copy("plots/index.php", outdir)
 
 	file = ROOT.TFile.Open(filename)
 	tree = file.Get("timing/EcalSplashTiming/timingTree")
