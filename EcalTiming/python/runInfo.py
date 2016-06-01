@@ -1,18 +1,20 @@
 from collections import namedtuple,defaultdict
 from FWCore.PythonUtilities.LumiList import LumiList
 
-jsonFolder="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/"
+jsonFolder2015="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions15/13TeV/"
+jsonFolder2016="/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/"
 
 RunPeriod = namedtuple('RunPeriod',("name","bfield","firstRun","lastRun","json","bunchSpacing","GT"))
 runPeriods = []
 
-Run2015AB_json           = jsonFolder + "Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_v2.txt"
-Run2015AB_ZeroTesla_json = jsonFolder + "Cert_246908-252126_13TeV_PromptReco_Collisions15_ZeroTesla_50ns_JSON.txt"
-Run2015CD_json           = jsonFolder + "Cert_246908-256869_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
-Run2015CD_ZeroTesla_json = jsonFolder + "Cert_246908-257599_13TeV_PromptReco_Collisions15_ZeroTesla_25ns_JSON.txt"
-Run254833_json           = jsonFolder + "Cert_254833_13TeV_PromptReco_Collisions15_JSON.txt"
-Run2015CD_silver_json    = jsonFolder + "Cert_246908-259891_13TeV_PromptReco_Collisions15_25ns_JSON_Silver.txt"
-
+Run2015AB_json           = jsonFolder2015 + "Cert_246908-255031_13TeV_PromptReco_Collisions15_50ns_JSON_v2.txt"
+Run2015AB_ZeroTesla_json = jsonFolder2015 + "Cert_246908-252126_13TeV_PromptReco_Collisions15_ZeroTesla_50ns_JSON.txt"
+Run2015CD_json           = jsonFolder2015 + "Cert_246908-256869_13TeV_PromptReco_Collisions15_25ns_JSON.txt"
+Run2015CD_ZeroTesla_json = jsonFolder2015 + "Cert_246908-257599_13TeV_PromptReco_Collisions15_ZeroTesla_25ns_JSON.txt"
+Run254833_json           = jsonFolder2015 + "Cert_254833_13TeV_PromptReco_Collisions15_JSON.txt"
+Run2015CD_silver_json    = jsonFolder2015 + "Cert_246908-259891_13TeV_PromptReco_Collisions15_25ns_JSON_Silver.txt"
+Run2016_json             = jsonFolder2016 + "Cert_271036-273730_13TeV_PromptReco_Collisions16_JSON.txt"
+Run2016_ZeroTesla_json   = jsonFolder2016 + "DCSOnly/json_DCSONLY_noBField.txt"
 #Run2015AB           = LumiList(filename = Run2015AB_json          )
 #Run2015AB_ZeroTesla = LumiList(filename = Run2015AB_ZeroTesla_json)
 #Run2015CD           = LumiList(filename = Run2015CD_json          )
@@ -25,10 +27,13 @@ runPeriods.append(RunPeriod("Run2015B-v1", False, 250985, 253620,  Run2015AB_Zer
 runPeriods.append(RunPeriod("Run2015B-v1", True,  250985, 253620,  Run2015AB_json,             50, "74X_dataRun2_Prompt_v0"))
 runPeriods.append(RunPeriod("Run2015C-v1", False, 253659, 256464,  Run2015CD_ZeroTesla_json,   25, "74X_dataRun2_Prompt_v1"))
 runPeriods.append(RunPeriod("Run2015C-v1", True,  253659, 256464,  Run2015CD_json,             25, "74X_dataRun2_Prompt_v1"))
-runPeriods.append(RunPeriod("Run2015D-v1", False, 256630, 999999,  Run2015CD_ZeroTesla_json,   25, "74X_dataRun2_Prompt_v2"))
-runPeriods.append(RunPeriod("Run2015D-v1", True,  256630, 999999,  Run2015CD_silver_json,      25, "74X_dataRun2_Prompt_v2"))
+runPeriods.append(RunPeriod("Run2015D-v1", False, 256630, 257389,  Run2015CD_ZeroTesla_json,   25, "74X_dataRun2_Prompt_v2"))
+runPeriods.append(RunPeriod("Run2015D-v1", True,  256630, 257389,  Run2015CD_silver_json,      25, "74X_dataRun2_Prompt_v2"))
                                                                 
-runPeriods.append(RunPeriod("Run2015C-v1", True,  254833, 254833,  Run254833_json,             50, "74X_dataRun2_Prompt_v1"))
+runPeriods.append(RunPeriod("Run2016A-v1", False, 270988, 271649,  Run2016_ZeroTesla_json,     25, "80X_dataRun2_Prompt_v8"))
+runPeriods.append(RunPeriod("Run2016B-v1", False, 271983, 273148,  Run2016_ZeroTesla_json,     25, "80X_dataRun2_Prompt_v8"))
+runPeriods.append(RunPeriod("Run2016A-v1", True,  270988, 271649,  Run2016_json,               25, "80X_dataRun2_Prompt_v8"))
+runPeriods.append(RunPeriod("Run2016B-v1", True,  271983, 273148,  Run2016_json,               25, "80X_dataRun2_Prompt_v8"))
 
 def LumiListForRunPeriod(rp, MIN_LUMIS=0):
 	ll = LumiList(filename = rp.json)
