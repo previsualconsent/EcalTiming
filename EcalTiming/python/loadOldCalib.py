@@ -253,6 +253,9 @@ def calcMeanByiRing(m,iRings):
 			time_sum2[key] += time*time
 			time_num[key] += 1
 	
+	if sum(time_num.values()) < 100:
+		return None, None
+
 	mean = dict()
 	stddev = dict()
 	for k in time_sum:
@@ -286,6 +289,9 @@ def calcMean(m):
 			time_sum2[crys.iz] += time*time
 			time_num[crys.iz] += 1
 	
+	if sum(time_num.values()) < 100:
+		return None, None
+
 	mean = dict()
 	stddev = dict()
 	for k in time_sum:

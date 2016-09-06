@@ -36,24 +36,38 @@ def plotAvePerMap(hist_name, maps, names):
 	Bon_end   = ["254232", "254914", "259891"]
 	aves = dict()
 	#aves[0]      = ("EB_ave_"  + hist_name, "EB",  np.zeros(nmaps))
-	aves[(0,-1)] = ("EB-", np.zeros(nmaps))
-	aves[(0,1)]  = ("EB+", np.zeros(nmaps))
-	aves[-1]     = ("EE-", np.zeros(nmaps))
-	aves[1]      = ("EE+", np.zeros(nmaps))
+	aves[(0,-1)] = ["EB-", np.zeros(nmaps)]
+	aves[(0,1)]  = ["EB+", np.zeros(nmaps)]
+	aves[-1]     = ["EE-", np.zeros(nmaps)]
+	aves[1]      = ["EE+", np.zeros(nmaps)]
 	sds = dict()
 	#sds[0]      = ("EB_stddev_"  + hist_name, "EB",  np.zeros(nmaps))
-	sds[(0,-1)] = ("EB-", np.zeros(nmaps))
-	sds[(0,1)]  = ("EB+", np.zeros(nmaps))
-	sds[-1]     = ("EE-", np.zeros(nmaps))
-	sds[1]      = ("EE+", np.zeros(nmaps))
+	sds[(0,-1)] = ["EB-", np.zeros(nmaps)]
+	sds[(0,1)]  = ["EB+", np.zeros(nmaps)]
+	sds[-1]     = ["EE-", np.zeros(nmaps)]
+	sds[1]      = ["EE+", np.zeros(nmaps)]
 	
+	failed = []
 	for i in range(nmaps):
+		print names[i]
 		ave,stddev = cal.calcMean(maps[i])
+		if ave is None:
+			failed.append(i)
+			continue
 		for k in aves:
 			if k in ave:
 				aves[k][1][i] = ave[k]
 				sds[k][1][i] = stddev[k]
 				print k,names[i],ave[k]
+
+	for i in reversed(failed):
+		nmaps -= 1
+		names.pop(i)
+		maps.pop(i)
+		for k in aves:
+			aves[k][1] = np.delete(aves[k][1],i)
+			sds[k][1]  = np.delete(sds[k][1],i)
+
 	
 	h = ROOT.TH1F("test","",1000,-.1,1.1)
 	h.SetLineColor(0)
@@ -65,10 +79,16 @@ def plotAvePerMap(hist_name, maps, names):
 
 	box_x1, box_x2 = getBoxXs(h, x, names, Bon_start, Bon_end)
 
-	binnames = ['251244', '254231', '256630','259626','259891']
+	if len(names) < 10:
+		binnames = names
+	else:
+		binnames = names[::len(names)/10]
+
+
+
 	labelBins(h, x, names,  binnames)
 
-	plot(h, x, aves, aves.keys(), "ave_" + hist_name, -1, 1, box_x1, box_x2)
+	plot(h, x, aves, aves.keys(), "ave_" + hist_name, -1.5, .7, box_x1, box_x2)
 
 	h.GetYaxis().SetTitle("Standard Deviation [ns]")
 	plot(h, x, sds, sds.keys(), "stddev_" + hist_name, 0, 2, box_x1, box_x2)
@@ -102,6 +122,7 @@ def plotPullPerMap(hist_name, maps, errors, names):
 	skews[1]      = ("EE+", np.zeros(nmaps))
 	
 	for i in range(nmaps):
+		print names[i]
 		ave,stddev,skew = cal.calcPull(maps[i], maps[i+1], errors[i])
 		for k in aves:
 			if k in ave:
@@ -120,7 +141,11 @@ def plotPullPerMap(hist_name, maps, errors, names):
 
 	box_x1, box_x2 = getBoxXs(h, x, names, Bon_start, Bon_end)
 
-	binnames = ['251244', '254231', '256630','259626','259891']
+	if len(names) < 10:
+		binnames = names
+	else:
+		binnames = names[::len(names)/10]
+
 	labelBins(h, x, names,  binnames)
 
 	plot(h, x, aves, aves.keys(), "ave_" + hist_name, -1, 1, box_x1, box_x2)
@@ -132,10 +157,18 @@ def plotPullPerMap(hist_name, maps, errors, names):
 	plot(h, x, skews, skews.keys(), "skew_" + hist_name, -200, 200, box_x1, box_x2)
 
 def labelBins(h, x, names, binnames):
+	binnames = {
+			"272011":"2016.04.28", 
+			"273006":"2016.05.10",
+			"274080":"2016.05.26",
+			"275000":"2016.06.13",
+			"276092":"2016.07.01",
+			"277070":"2016.07.19",
+			}
 	for i in range(len(names)):
 		bin = h.FindBin(x[i])
 		if names[i] in binnames:
-			h.GetXaxis().SetBinLabel(bin,names[i])
+			h.GetXaxis().SetBinLabel(bin,binnames[names[i]])
 
 def getBoxXs(h, x, names, Bon_start, Bon_end):
 	box_x1 = [0]*len(Bon_start)
@@ -168,7 +201,7 @@ def plotRingAverPerMap(hist_name, maps, names):
 	Bon_start = ["251244", "254790", "256630"] 
 	Bon_end   = ["254232", "254914", "259891"]
 
-	iRingsEB = [ (0,1), (0,80), (0,-1), (0,-80)]
+	iRingsEB = [ (0,-80), (0,-1), (0,1), (0,80)]
 	iRingsEEM= [(-1, 5), (-1,15), (-1,25), (-1,35)]
 	iRingsEEP= [(1, 5), (1,15), (1,25), (1,35)]
 
@@ -176,15 +209,30 @@ def plotRingAverPerMap(hist_name, maps, names):
 	aves = dict()
 	sds = dict()
 	for key in iRings:
-		aves[key] = ( "(%d,%d)" % key, np.zeros(nmaps))
-		sds[key] = ( "(%d,%d)" % key, np.zeros(nmaps))
+		aves[key] = [ "(%d,%d)" % key, np.zeros(nmaps)]
+		sds[key] = [ "(%d,%d)" % key, np.zeros(nmaps)]
 	
+	failed = []
 	for i in range(nmaps):
+		print names[i],
 		ave,stddev = cal.calcMeanByiRing(maps[i], iRings)
+		if ave is None:
+			print "failed"
+			failed.append(i)
+			continue
+		print
 		for k in aves:
 			if k in ave:
 				aves[k][1][i] = ave[k]
 				sds[k][1][i] = stddev[k]
+
+	for i in reversed(failed):
+		nmaps -= 1
+		names.pop(i)
+		maps.pop(i)
+		for k in aves:
+			aves[k][1] = np.delete(aves[k][1],i)
+			sds[k][1]  = np.delete(sds[k][1],i)
 
 	
 	h = ROOT.TH1F("test","",1000,-.1,1.1)
@@ -197,12 +245,15 @@ def plotRingAverPerMap(hist_name, maps, names):
 
 	box_x1, box_x2 = getBoxXs(h, x, names, Bon_start, Bon_end)
 
-	binnames = ['251244', '254231', '256630','259626','259891']
+	if len(names) < 10:
+		binnames = names
+	else:
+		binnames = names[::len(names)/10]
 	labelBins(h, x, names, binnames)
 
-	plot(h, x, aves, iRingsEB, "ave_EB_iRing"  , -1, 1, box_x1, box_x2)
-	plot(h, x, aves, iRingsEEM, "ave_EEM_iRing", -1, 1, box_x1, box_x2)
-	plot(h, x, aves, iRingsEEP, "ave_EEP_iRing", -1, 1, box_x1, box_x2)
+	plot(h, x, aves, iRingsEB, "ave_EB_iRing"  , -1.5, .7, box_x1, box_x2)
+	plot(h, x, aves, iRingsEEM, "ave_EEM_iRing", -1.5, .7, box_x1, box_x2)
+	plot(h, x, aves, iRingsEEP, "ave_EEP_iRing", -1.5, .7, box_x1, box_x2)
 
 	h.GetYaxis().SetTitle("Standard Deviation [ns]")
 	plot(h, x, sds, iRingsEB , "stddev_EB_iRing",  0, 2, box_x1, box_x2)
@@ -210,7 +261,7 @@ def plotRingAverPerMap(hist_name, maps, names):
 	plot(h, x, sds, iRingsEEP, "stddev_EEP_iRing", 0, 2, box_x1, box_x2)
 
 def plot(h, x, graphs, keys, name, min_y, max_y, box_x1, box_x2):
-	c = ROOT.TCanvas("c","c",1600,1200)
+	c = ROOT.TCanvas("c","c",1600,1300)
 	h.SetTitle("Offline Ecal Timing [P. Hansen]")
 	h.SetMinimum(min_y)
 	h.SetMaximum(max_y)
@@ -218,6 +269,7 @@ def plot(h, x, graphs, keys, name, min_y, max_y, box_x1, box_x2):
 	h.SetFillStyle(3004)
 	h.SetFillColor(ROOT.kBlack)
 
+	c.SetBottomMargin(.2)
 	x1 = ROOT.gStyle.GetPadLeftMargin();
 	x2 = 1 - ROOT.gStyle.GetPadRightMargin();
 	y2 = 1 - ROOT.gStyle.GetPadTopMargin();
@@ -227,8 +279,8 @@ def plot(h, x, graphs, keys, name, min_y, max_y, box_x1, box_x2):
 	leg.SetNColumns(len(keys) + 1)
 
 	#added boxes
-	leg.AddEntry(h,"Bon","f")
-	boxes = drawBoxes(h, box_x1,box_x2,min_y,max_y)
+	#leg.AddEntry(h,"Bon","f")
+	#boxes = drawBoxes(h, box_x1,box_x2,min_y,max_y)
 	ci = 0
 	mg_ave = ROOT.TMultiGraph()
 	for key in keys:
@@ -245,6 +297,7 @@ def plot(h, x, graphs, keys, name, min_y, max_y, box_x1, box_x2):
 	leg.Draw()
 	mg_ave.Draw("LP")
 	c.SaveAs(outdir + "/" +  name + ".png")
+	c.SaveAs(outdir + "/" +  name + ".C")
 
 def listDiff(hist_name, maps1, maps2, names1, names2, errs=[]):
 	mg = dict()
@@ -284,12 +337,14 @@ if __name__ == "__main__":
 	ROOT.gROOT.SetBatch(True)
 	file_pattern = sys.argv[1]
 
-	dir, basename = os.path.split(file_pattern)
-	dir = dir.split('/')
-	print dir[-1:]
-	outdir = '/'.join(dir) + "/plots/" + "/" + sys.argv[2] + "/"
+	#dir, basename = os.path.split(file_pattern)
+	#dir = dir.split('/')
+	#print dir[-1:]
+	##outdir = '/'.join(dir) + "/plots/" + "/" + sys.argv[2] + "/"
 	#outdir = '/'.join(dir[:-1]) + "/plots/" + "/" + sys.argv[2] + "/"
-	outdir = os.path.normpath(outdir)
+	#outdir = os.path.normpath(outdir)
+
+	outdir = sys.argv[2]
 
 	makePlotFolder(outdir)
 
@@ -297,15 +352,15 @@ if __name__ == "__main__":
 	files = [ file_pattern % s for s in subs ]
 	print "loading maps"
 	maps =  [ cal.getCalibFromFile(file) for file in files ]
-	print "loading errors"
-	maps_err =  [ cal.getErrorFromFile(file) for file in files ]
+	#print "loading errors"
+	#maps_err =  [ cal.getErrorFromFile(file) for file in files ]
 	
 	print outdir
-	#plotRingAverPerMap("PerRuniRing", maps, subs)
-	#plotAvePerMap("PerRun", maps, subs)
+	plotRingAverPerMap("PerRuniRing", maps, subs)
+	plotAvePerMap("PerRun", maps, subs)
    #do diff each step
 	#listDiff( sys.argv[2], maps[:-1], maps[1:], subs[:-1], subs[1:], errs=maps_err[:-1])
    #do diff with respect to first
-	names = [ s.split('/')[0] for s in subs]
-	listDiff(sys.argv[2] , maps[:1]*(len(maps)-1), maps[1:], names[:1]*(len(maps) -1), names[1:], errs=maps_err[:-1])
+	#names = [ s.split('/')[0] for s in subs]
+	#listDiff(sys.argv[2] , maps[:1]*(len(maps)-1), maps[1:], names[:1]*(len(maps) -1), names[1:], errs=maps_err[:-1])
 

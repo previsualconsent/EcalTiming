@@ -150,4 +150,7 @@ def makePlotFolder(path):
 		if exc.errno == errno.EEXIST and os.path.isdir(path):
 			pass
 		else: raise
-	shutil.copy("plots/index.php", path)
+	try:
+		shutil.copy("plots/index.php", path)
+	except:
+		pass
