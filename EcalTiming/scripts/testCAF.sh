@@ -17,7 +17,7 @@ STREAM=AlCaPhiSym
 NEVENTS=-1
 QUEUE=2nd
 EOSPREFIX=root://eoscms//eos/cms/
-EOSDIR=/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/Run2016A-v1/
+EOSDIR=/store/group/dpg_ecal/alca_ecalcalib/EcalTiming/
 #DIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/RunII/
 CONFIG=$PWD/test/ecalTime_fromAlcaStream_cfg.py
 EVENTSPERJOB=500000
@@ -103,10 +103,10 @@ do
 		echo $RUN not in JSON $JSON
 		continue
 	fi
-	OUTDIR=$EOSDIR/${STREAM}-${RUN}/
+	OUTDIR=$EOSDIR/${RUNPERIOD}/${STREAM}-${RUN}/
 	$eos mkdir ${EOSDIR}
 	$eos mkdir ${OUTDIR}
-	AFSDIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/analysis/Run2016-v1/${STREAM}-${RUN}/
+	AFSDIR=/afs/cern.ch/work/p/phansen/public/EcalTiming/analysis/${RUNPERIOD}/${STREAM}-${RUN}/
 	mkdir -p ${AFSDIR}
 
 	if [[ $STEP == *"RECO"* ]]

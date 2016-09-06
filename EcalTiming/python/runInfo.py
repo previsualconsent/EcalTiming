@@ -13,7 +13,7 @@ Run2015CD_json           = jsonFolder2015 + "Cert_246908-256869_13TeV_PromptReco
 Run2015CD_ZeroTesla_json = jsonFolder2015 + "Cert_246908-257599_13TeV_PromptReco_Collisions15_ZeroTesla_25ns_JSON.txt"
 Run254833_json           = jsonFolder2015 + "Cert_254833_13TeV_PromptReco_Collisions15_JSON.txt"
 Run2015CD_silver_json    = jsonFolder2015 + "Cert_246908-259891_13TeV_PromptReco_Collisions15_25ns_JSON_Silver.txt"
-Run2016_json             = jsonFolder2016 + "Cert_271036-273730_13TeV_PromptReco_Collisions16_JSON.txt"
+Run2016_json             = jsonFolder2016 + "DCSOnly/json_DCSONLY.txt"
 Run2016_ZeroTesla_json   = jsonFolder2016 + "DCSOnly/json_DCSONLY_noBField.txt"
 #Run2015AB           = LumiList(filename = Run2015AB_json          )
 #Run2015AB_ZeroTesla = LumiList(filename = Run2015AB_ZeroTesla_json)

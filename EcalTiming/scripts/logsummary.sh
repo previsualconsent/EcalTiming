@@ -1,6 +1,8 @@
 DO=$1
-echo \#Run Passed
-grep  "TrigReport Events"  log/stderr-AlCaPhiSym-* | awk '{ counts[substr($1,23,6)]+=$8} END{for (i in counts) printf "%s\t%7.2fM\n", i,counts[i]/1000000}' |sort 
+echo \#Run RecoPassed
+grep  "TrigReport Events"  log/stderr-AlCaPhiSym-*_RECO.log | awk '{ counts[substr($1,23,6)]+=$8} END{for (i in counts) printf "%s\t%7.2fM\n", i,counts[i]/1000000}' |sort 
+echo \#Run AnalysisPassed
+grep  "TrigReport Events"  log/stderr-AlCaPhiSym-*-1.log | awk '{ counts[substr($1,23,6)]+=$8} END{for (i in counts) printf "%s\t%7.2fM\n", i,counts[i]/1000000}' |sort 
 echo \#Failed Jobs
 failed=$(grep -L "TrigReport Events" log/stderr-AlCaPhiSym-*)
 for stderr in $failed;
